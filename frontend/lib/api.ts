@@ -1,4 +1,6 @@
-export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+// Set NEXT_PUBLIC_API_URL to override. An empty value falls back to these defaults.
+const DEFAULT_API = process.env.NODE_ENV === "production" ? "https://verrier-x-api.onrender.com" : "http://localhost:8000";
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API).replace(/\/$/, "");
 
 export type Query = { ra: number; dec: number; fov: number; band: number };
 
