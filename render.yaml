@@ -1,0 +1,9 @@
+# Render blueprint for the backend. Virginia is next to the SPHEREx data on Amazon S3 (us-east-1).
+services:
+  - type: web
+    name: verrier-x-api
+    runtime: docker
+    region: virginia
+    plan: free
+    rootDir: backend
+    healthCheckPath: /api/health
