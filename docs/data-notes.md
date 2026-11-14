@@ -92,3 +92,18 @@ The total over one year is 10.2″ north, or about 1.7 pixels. The measurement i
 - **Positions change.** Search at the star's current position, not its year-2000 catalogue position (Barnard's Star has moved about 4.5 arcminutes).
 - **Each exposure is at a different wavelength.** Group frames by detector and label them.
 - **IRSA can be down.** Retry, cache, and show a clear message.
+
+## 7. Backend results (V04–V06, 2026-11-15)
+
+Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment check: `scripts/v05_alignment_check.py`.
+
+- **Search radius is 0.003°**, so the target itself is inside every exposure returned. This gives fewer files than the 0.02° counts in section 2 (Barnard's Star, detector 2: 61 exposures in 3 seasons).
+- **Caching works.** Barnard's Star, 10 arcminutes, detector 2: the first run downloaded every cutout; the repeat run downloaded none and took 1.3 s. Over HTTP a finished request is answered in about 2 ms.
+- **First-request time from a laptop in India:** about 40 s for 36–45 exposures. The IRSA search took 12–30 s of that.
+- **Alignment:** six field stars near Barnard's Star, 61 frames: 90% of position measurements are within 0.21 native pixels (1.3″) of the star's median position. Target was 0.5 pixels.
+- **Motion is visible in the aligned frames:** Barnard's Star moves 9.5″ north between August 2025 and August 2026 (catalogue: about 10.4″/yr).
+- **Only IMAGE and FLAGS are read for frames.** ZODI is not read: over a field this small it is flat, and subtracting each frame's median background removes it. This halves the number of requests per cutout.
+- **Wavelength** at the target comes from the `WCS-WAVE` table, which is the same for every file of a detector and is read once per detector.
+- **Repaired pixels:** TRANSIENT, SUR_ERROR, NONFUNC, MISSING_DATA, HOT, COLD, PHANMISS and SNOWBALL pixels are replaced by the median of their neighbours. OVERFLOW and NONLINEAR pixels (cores of very bright stars) are replaced by their brightest neighbour. OUTLIER is left alone, because a moving object might be flagged as one.
+- **An incomplete search is not cached.** If part of the IRSA search fails, the answer is returned with a warning and rebuilt on the next request.
+- **Known display problem:** some frames have a bright band across part of the field (seen in one Barnard's Star frame from August 2025). Not yet handled.
