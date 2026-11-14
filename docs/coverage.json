@@ -1,0 +1,405 @@
+{
+  "Barnard's Star": {
+    "ra": 269.4486,
+    "dec": 4.7685,
+    "collections": {
+      "spherex_dr1": {
+        "files": 242,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2025-08-15",
+            "end": "2025-10-01",
+            "files": 120,
+            "per_detector": {
+              "D1": 24,
+              "D2": 18,
+              "D3": 18,
+              "D4": 23,
+              "D5": 20,
+              "D6": 17
+            }
+          },
+          {
+            "start": "2026-03-11",
+            "end": "2026-05-05",
+            "files": 122,
+            "per_detector": {
+              "D1": 18,
+              "D2": 19,
+              "D3": 24,
+              "D4": 18,
+              "D5": 19,
+              "D6": 24
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W33_2C/l2b-v27-2026-228/6/level2_2025W33_2C_0321_1D6_spx_l2b-v27-2026-228.fits"
+      },
+      "spherex_dr1_deep": {
+        "files": 0,
+        "failed_attempts": 1,
+        "seasons": []
+      },
+      "spherex_qr3": {
+        "files": 124,
+        "failed_attempts": 3,
+        "seasons": [
+          {
+            "start": "2026-08-16",
+            "end": "2026-09-22",
+            "files": 124,
+            "per_detector": {
+              "D1": 18,
+              "D2": 25,
+              "D3": 19,
+              "D4": 18,
+              "D5": 25,
+              "D6": 19
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W33_2A/l2b-v27-2026-241/6/level2_2026W33_2A_0594_3D6_spx_l2b-v27-2026-241.fits"
+      },
+      "spherex_qr3_deep": {
+        "files": 0,
+        "failed_attempts": 1,
+        "seasons": []
+      }
+    }
+  },
+  "Epsilon Indi B": {
+    "ra": 331.09,
+    "dec": -56.801,
+    "collections": {
+      "spherex_dr1": {
+        "files": 351,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2025-04-24",
+            "end": "2025-06-10",
+            "files": 128,
+            "per_detector": {
+              "D1": 4,
+              "D2": 32,
+              "D3": 28,
+              "D4": 4,
+              "D5": 31,
+              "D6": 29
+            }
+          },
+          {
+            "start": "2025-09-28",
+            "end": "2025-11-12",
+            "files": 147,
+            "per_detector": {
+              "D1": 24,
+              "D2": 30,
+              "D3": 23,
+              "D4": 24,
+              "D5": 24,
+              "D6": 22
+            }
+          },
+          {
+            "start": "2026-04-18",
+            "end": "2026-05-04",
+            "files": 76,
+            "per_detector": {
+              "D1": 20,
+              "D2": 7,
+              "D3": 12,
+              "D4": 19,
+              "D5": 7,
+              "D6": 11
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W18_1B/l2b-v27-2026-196/6/level2_2025W18_1B_0081_1D6_spx_l2b-v27-2026-196.fits"
+      },
+      "spherex_dr1_deep": {
+        "files": 0,
+        "failed_attempts": 1,
+        "seasons": []
+      },
+      "spherex_qr3": {
+        "files": 120,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2026-09-22",
+            "end": "2026-10-02",
+            "files": 120,
+            "per_detector": {
+              "D2": 24,
+              "D3": 36,
+              "D5": 24,
+              "D6": 36
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W39_1A/l2b-v27-2026-268/3/level2_2026W39_1A_0276_2D3_spx_l2b-v27-2026-268.fits"
+      },
+      "spherex_qr3_deep": {
+        "files": 0,
+        "failed_attempts": 0,
+        "seasons": []
+      }
+    }
+  },
+  "WISE 0855": {
+    "ra": 133.7685,
+    "dec": -7.2429,
+    "collections": {
+      "spherex_dr1": {
+        "files": 258,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2025-05-05",
+            "end": "2025-05-06",
+            "files": 30,
+            "per_detector": {
+              "D1": 4,
+              "D2": 8,
+              "D3": 3,
+              "D4": 4,
+              "D5": 8,
+              "D6": 3
+            }
+          },
+          {
+            "start": "2025-10-31",
+            "end": "2025-12-13",
+            "files": 128,
+            "per_detector": {
+              "D1": 18,
+              "D2": 25,
+              "D3": 21,
+              "D4": 18,
+              "D5": 25,
+              "D6": 21
+            }
+          },
+          {
+            "start": "2026-04-21",
+            "end": "2026-05-14",
+            "files": 100,
+            "per_detector": {
+              "D1": 14,
+              "D2": 15,
+              "D3": 21,
+              "D4": 14,
+              "D5": 15,
+              "D6": 21
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W19_1B/l2b-v27-2026-197/3/level2_2025W19_1B_0116_1D3_spx_l2b-v27-2026-197.fits"
+      },
+      "spherex_dr1_deep": {
+        "files": 0,
+        "failed_attempts": 0,
+        "seasons": []
+      },
+      "spherex_qr3": {
+        "files": 0,
+        "failed_attempts": 0,
+        "seasons": []
+      },
+      "spherex_qr3_deep": {
+        "files": 0,
+        "failed_attempts": 0,
+        "seasons": []
+      }
+    }
+  },
+  "RW Aurigae": {
+    "ra": 76.9563,
+    "dec": 30.4014,
+    "collections": {
+      "spherex_dr1": {
+        "files": 227,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-20",
+            "files": 113,
+            "per_detector": {
+              "D1": 19,
+              "D2": 19,
+              "D3": 19,
+              "D4": 19,
+              "D5": 18,
+              "D6": 19
+            }
+          },
+          {
+            "start": "2026-02-20",
+            "end": "2026-03-12",
+            "files": 114,
+            "per_detector": {
+              "D1": 19,
+              "D2": 19,
+              "D3": 19,
+              "D4": 19,
+              "D5": 19,
+              "D6": 19
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W36_1A/l2b-v27-2026-232/1/level2_2025W36_1A_0095_1D1_spx_l2b-v27-2026-232.fits"
+      },
+      "spherex_dr1_deep": {
+        "files": 0,
+        "failed_attempts": 0,
+        "seasons": []
+      },
+      "spherex_qr3": {
+        "files": 111,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2026-09-02",
+            "end": "2026-09-16",
+            "files": 111,
+            "per_detector": {
+              "D1": 18,
+              "D2": 19,
+              "D3": 18,
+              "D4": 19,
+              "D5": 19,
+              "D6": 18
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W36_1A/l2b-v27-2026-252/1/level2_2026W36_1A_0476_1D1_spx_l2b-v27-2026-252.fits"
+      },
+      "spherex_qr3_deep": {
+        "files": 0,
+        "failed_attempts": 0,
+        "seasons": []
+      }
+    }
+  },
+  "R Draconis": {
+    "ra": 248.1675,
+    "dec": 66.755,
+    "collections": {
+      "spherex_dr1": {
+        "files": 427,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2025-05-16",
+            "end": "2025-07-22",
+            "files": 165,
+            "per_detector": {
+              "D1": 23,
+              "D2": 37,
+              "D3": 23,
+              "D4": 23,
+              "D5": 37,
+              "D6": 22
+            }
+          },
+          {
+            "start": "2025-10-17",
+            "end": "2026-01-13",
+            "files": 214,
+            "per_detector": {
+              "D1": 45,
+              "D2": 38,
+              "D3": 24,
+              "D4": 45,
+              "D5": 38,
+              "D6": 24
+            }
+          },
+          {
+            "start": "2026-04-22",
+            "end": "2026-05-13",
+            "files": 48,
+            "per_detector": {
+              "D3": 24,
+              "D6": 24
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W20_2D/l2b-v27-2026-198/6/level2_2025W20_2D_0243_1D6_spx_l2b-v27-2026-198.fits"
+      },
+      "spherex_dr1_deep": {
+        "files": 1240,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2025-04-24",
+            "end": "2025-05-08",
+            "files": 87,
+            "per_detector": {
+              "D3": 44,
+              "D6": 43
+            }
+          },
+          {
+            "start": "2025-08-29",
+            "end": "2025-11-08",
+            "files": 261,
+            "per_detector": {
+              "D1": 131,
+              "D4": 130
+            }
+          },
+          {
+            "start": "2026-02-08",
+            "end": "2026-05-06",
+            "files": 892,
+            "per_detector": {
+              "D3": 446,
+              "D6": 446
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/dr1/level2/2025W18_1B/l2b-v27-2026-196/6/level2_2025W18_1B_0085_2D6_spx_l2b-v27-2026-196.fits"
+      },
+      "spherex_qr3": {
+        "files": 127,
+        "failed_attempts": 2,
+        "seasons": [
+          {
+            "start": "2026-05-16",
+            "end": "2026-07-16",
+            "files": 127,
+            "per_detector": {
+              "D1": 24,
+              "D2": 19,
+              "D3": 20,
+              "D4": 24,
+              "D5": 19,
+              "D6": 21
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W20_2A/l2b-v27-2026-267/3/level2_2026W20_2A_0294_4D3_spx_l2b-v27-2026-267.fits"
+      },
+      "spherex_qr3_deep": {
+        "files": 738,
+        "failed_attempts": 0,
+        "seasons": [
+          {
+            "start": "2026-07-10",
+            "end": "2026-09-27",
+            "files": 738,
+            "per_detector": {
+              "D1": 368,
+              "D4": 370
+            }
+          }
+        ],
+        "example_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W30_1B/l2b-v27-2026-222/1/level2_2026W30_1B_0199_3D1_spx_l2b-v27-2026-222.fits"
+      }
+    }
+  }
+}

@@ -80,7 +80,17 @@
 | IRSA returned `502 Proxy Error` on several queries on 2026-11-14 | [ARCHIVE] |
 | Required citation: DOI 10.26131/IRSA652 (QR2), 10.26131/IRSA662 (QR3), plus the SPHEREx acknowledgement text | [DOC] |
 
-### 2.3 Coverage of the test targets (0.01° search radius, 2026-11-14)
+### 2.3 Coverage of the test targets
+
+> **Superseded on 2026-11-14 by V01 and V02.** See [docs/data-notes.md](docs/data-notes.md). In short:
+> - Search `spherex_dr1` and `spherex_qr3` (plus their deep versions), not `spherex_qr2`.
+> - All five targets have at least three seasons of data.
+> - Pixels come from the Amazon S3 mirror by byte-range reads, not from the IRSA cutout service.
+> - Barnard's Star was measured moving about 10″/yr northward across three seasons.
+>
+> The table and open question below are the first attempt, kept for the record.
+
+#### First attempt (0.01° search radius, QR2 and QR3 only)
 
 | Target | `spherex_qr3` | `spherex_qr2` |
 |---|---|---|
