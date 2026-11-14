@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+@layer components {
+  .field {
+    @apply w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500;
+  }
+  .btn {
+    @apply rounded-md border border-slate-700 bg-slate-800 px-3 py-1.5 text-slate-100 hover:bg-slate-700 disabled:opacity-40;
+  }
+  .heading {
+    @apply mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400;
+  }
+}
