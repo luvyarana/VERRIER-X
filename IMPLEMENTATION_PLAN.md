@@ -299,9 +299,9 @@ Each task lists what to do and how to know it is done. **M** = must have, **S** 
 
 | ID | Decision |
 |---|---|
-| D1 | **Deadline: 15 November 2026, 11:59 pm.** The submission includes **7 slides**. |
+| D1 | **Deadline: 15 November 2026, 11:59 pm.** The demo is a slide deck of **at most 7 slides** (see §10). |
 | D2 | Frontend on Vercel (account exists). Backend on a small container host, chosen after V02 measures memory use. |
-| D3 | Two people. Luvya builds the frontend and backend. The teammate takes one small, important task: **V19** (below). |
+| D3 | Two people. Luvya builds the frontend and backend. Sainy is the validation and submission lead (below). |
 | D4 | The GitHub repository is public. |
 
 ### Cut line for the deadline
@@ -314,16 +314,83 @@ With about a day and a half, the order is strict:
 
 Slides and submission start no later than 6 pm on 15 November, whatever state the features are in.
 
-### Teammate task (V19, expanded)
+### Teammate task: validation and submission lead (Sainy, `Sainyy56`)
 
-**Target fact sheet and test record.** It needs no code, and the demo and three of the slides depend on it.
+She owns the proof that the tool works and the way it is presented to the judges. This covers the Validity and Presentation judging criteria, and the challenge's "test your tool on" requirement. It needs no backend or frontend code.
 
-1. For each of the five test targets, record in `docs/demo-script.md`: exact coordinates (J2000), proper motion, brightness, and one sentence on what a viewer should expect to see (moves / varies / may be too faint).
-2. Once the tool is live, open each target, take a screenshot, and write what is actually visible.
-3. Hand over the screenshots and notes for the slides.
+**Part 1 — Target fact sheet (start now; V01 is waiting on it)**
 
-Step 1 can start immediately and also gives V01 the exact coordinates it needs.
+For each of the five test targets, record in `docs/targets.md`:
 
-## 10. First task after approval
+1. Exact coordinates (J2000) and the catalogue they come from.
+2. Proper motion (″/yr) and parallax.
+3. Brightness in the near-infrared (J, H, K; W1, W2 where known).
+4. **Predicted shift between SPHEREx seasons**, in arcseconds and in pixels (1 pixel = 6.14″). For example, Barnard's Star at about 10.4″/yr moves about 5.2″ ≈ 0.85 px in six months.
+5. For the two variable stars: period and brightness range.
+6. One sentence on what a viewer should expect: moves, varies, or may be too faint.
+
+**Part 2 — Validation record (once the tool is live; V19)**
+
+1. Open each target in the tool and take a screenshot.
+2. Compare what is seen with the Part 1 prediction: did it move by about the predicted amount, in the predicted direction?
+3. Write one honest paragraph per target in `docs/demo-script.md`, including targets where nothing is visible and why.
+4. Report anything that looks wrong (misaligned frames, wrong labels) as a GitHub issue.
+
+**Part 3 — Submission (V20)**
+
+1. Lead the slide deck, at most 7 slides, following the checklist in §10.
+2. Draft the project page text: high-level summary, detailed description, NASA data, partner data and references.
+3. Test every link in a private browser window before submitting.
+
+Luvya supplies the screenshots of features and the technical description; Sainy owns the story and the evidence.
+
+## 10. Submission checklist
+
+Source: [Project Submission Guide](https://www.spaceappschallenge.org/resources/project-submission-guide/), read 2026-11-14.
+
+**Deadline:** click **"Submit for Judging"** before Sunday 15 November, 11:59 pm, local time of the team's Local Event (for the Universal Event, the Team Owner's local time). Anything saved after that is not judged. Resubmitting before the deadline is allowed; the last saved version counts.
+
+**Eligibility**
+
+- [ ] All team members are confirmed participants at the **same Local Event**.
+- [ ] Every required form field is filled, in English.
+- [ ] Nothing shows the likeness of anyone under 18.
+
+**Project form fields**
+
+- [ ] Project Name
+- [ ] High-Level Project Summary (what it is, how it addresses the challenge, why it matters)
+- [ ] Link to Project Demo
+- [ ] Link to Final Project (the live site or the GitHub repository)
+- [ ] Detailed Project Description (what it does, how it works, tools and languages)
+- [ ] Use of AI tools (the form calls this "Super Intelligence (SI)")
+- [ ] NASA Data (at least one NASA source is required for Global Awards: SPHEREx via IRSA)
+- [ ] Space Agency Partner Data and Other References (every dataset, tool, library and image used)
+
+**Demo**
+
+- [ ] Slide deck of **at most 7 slides, including the title and intro slides**, or a video of at most 30 seconds. Going over makes the project ineligible for Global Judging.
+- [ ] Slides state the team name, the members' names and the challenge chosen.
+- [ ] Slides show an image of the project, describe the user experience, and say how NASA and partner data make it possible.
+- [ ] Hosted externally (Google Drive, GitHub, etc.) with a public link that needs no login. Test it in a private browser window.
+
+**Links must work for judges**
+
+- [ ] Live site and repository open without any login.
+- [ ] Optional but recommended for a new website: request a FortiGuard Web Filter Classification so judges' networks don't block it.
+
+**AI disclosure**
+
+- [ ] The form answer says where and how AI tools were used.
+- [ ] AI-generated code is acknowledged in descriptive text and metadata (README note and commit trailers).
+- [ ] Any AI-generated image or video carries a visible watermark.
+- [ ] No AI-generated content uses NASA logos or mission identifiers.
+- The guide says AI should not be used to come up with the idea for solving the challenge.
+
+**Judging criteria:** Impact, Creativity, Validity, Relevance, Presentation. Most of the score comes from the project page itself; the demo mainly affects Presentation.
+
+**Partner data:** using Space Agency Partner data is encouraged. ESA is a partner, so the Gaia overlay (V12) counts; the challenge page also lists CSA's NEOSSat data.
+
+## 11. First task after approval
 
 **V01 + V02 (data spikes).** Two short scripts, no application code. They answer the two questions the whole design rests on: are two seasons of data reachable for the test targets, and how fast is a cutout.
