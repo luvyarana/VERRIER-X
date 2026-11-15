@@ -25,3 +25,13 @@ def to_png(frame: np.ndarray, low: float, high: float, soft: float) -> bytes:
     buf = io.BytesIO()
     Image.fromarray(pixels[::-1], mode="L").save(buf, format="PNG", optimize=True)
     return buf.getvalue()
+
+
+def to_png_signed(frame: np.ndarray, limit: float, soft: float) -> bytes:
+    """PNG of a difference image: mid-grey is no change, white is brighter, black is fainter.
+    Pixels with no data are mid-grey."""
+    scaled = 0.5 + 0.5 * np.arcsinh(frame / soft) / np.arcsinh(limit / soft)
+    pixels = (np.where(np.isfinite(scaled), np.clip(scaled, 0, 1), 0.5) * 255).astype("u1")
+    buf = io.BytesIO()
+    Image.fromarray(pixels[::-1], mode="L").save(buf, format="PNG", optimize=True)
+    return buf.getvalue()

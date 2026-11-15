@@ -22,7 +22,8 @@ export default function Viewer({ result }: { result: Result }) {
   const [loaded, setLoaded] = useState(0);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const stacked = result.request.mode === "seasons";
+  const stacked = result.request.mode !== "exposures";
+  const diff = result.request.mode === "difference";
   const [fps, setFps] = useState(stacked ? 1 : 4);
   const [marker, setMarker] = useState(true);
   const [showGaia, setShowGaia] = useState(true);
@@ -161,7 +162,9 @@ export default function Viewer({ result }: { result: Result }) {
           )}
           <div className="pointer-events-none absolute left-3 top-3 rounded bg-black/60 px-2 py-1 text-sm font-medium" style={{ color: colour }}>
             {stacked && frame.time_start && frame.time_end ? dateRange(frame.time_start, frame.time_end) : niceDate(frame.time)}
-            {stacked ? (
+            {diff && frame.minus ? (
+              <span className="text-slate-200"> minus {dateRange(frame.minus.time_start, frame.minus.time_end)}</span>
+            ) : stacked ? (
               <span className="text-slate-200"> · {frame.n_exposures} exposures combined</span>
             ) : (
               frame.wavelength_um != null && <span className="text-slate-200"> · {frame.wavelength_um.toFixed(2)} µm</span>
@@ -225,7 +228,13 @@ export default function Viewer({ result }: { result: Result }) {
             {seasons.map((s) => (
               <li key={s.index}>
                 <button
-                  onClick={() => (setPlaying(false), setIndex(frames.findIndex((f) => f.season === s.index)))}
+                  onClick={() => {
+                    const i = frames.findIndex((f) => f.season === s.index);
+                    if (i >= 0) {
+                      setPlaying(false);
+                      setIndex(i);
+                    }
+                  }}
                   className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left hover:bg-slate-800 ${frame.season === s.index ? "bg-slate-800" : ""}`}
                 >
                   <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: SEASON_COLOURS[s.index % SEASON_COLOURS.length] }} />
@@ -237,7 +246,9 @@ export default function Viewer({ result }: { result: Result }) {
           </ul>
           {seasons.length > 1 && (
             <p className="mt-2 text-xs text-slate-500">
-              {stacked
+              {diff
+                ? "Each frame is a later visit minus the first visit. Grey means no change. Something that moved leaves a dark spot where it was and a bright spot where it is now. Bright stars leave small rings, because each visit samples slightly different wavelengths and pixel positions."
+                : stacked
                 ? "Each frame is one visit, with all its exposures combined into a deeper image. Anything that jumps from frame to frame has moved between visits."
                 : "Anything that jumps when the colour changes has moved between visits. Stars that stay put are far away."}
             </p>
@@ -256,7 +267,11 @@ export default function Viewer({ result }: { result: Result }) {
             {stacked && (
               <>
                 <dt className="text-slate-500">Combined</dt>
-                <dd>{frame.n_exposures} exposures (median)</dd>
+                <dd>
+                  {diff && frame.minus
+                    ? `${frame.n_exposures - frame.minus.n_exposures} exposures, minus ${frame.minus.n_exposures} from the first visit`
+                    : `${frame.n_exposures} exposures (median)`}
+                </dd>
               </>
             )}
             <dt className="text-slate-500">Wavelength</dt>
@@ -277,7 +292,7 @@ export default function Viewer({ result }: { result: Result }) {
             <dt className="text-slate-500">{stacked ? "Source files" : "Source file"}</dt>
             <dd className="min-w-0">
               <a href={frame.source_url} className="break-all text-cyan-400 hover:underline" target="_blank" rel="noreferrer">
-                {stacked ? `first of ${frame.n_exposures} exposures` : frame.id}
+                {diff ? "first exposure of the later visit" : stacked ? `first of ${frame.n_exposures} exposures` : frame.id}
               </a>
             </dd>
           </dl>

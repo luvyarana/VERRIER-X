@@ -2,7 +2,7 @@
 const DEFAULT_API = process.env.NODE_ENV === "production" ? "https://verrier-x-api.onrender.com" : "http://localhost:8000";
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API).replace(/\/$/, "");
 
-export type Mode = "seasons" | "exposures";
+export type Mode = "seasons" | "difference" | "exposures";
 export type Query = { ra: number; dec: number; fov: number; band: number; mode: Mode };
 
 export type Frame = {
@@ -19,6 +19,7 @@ export type Frame = {
   time_start?: string;
   time_end?: string;
   n_exposures: number;
+  minus?: { season: number; time_start: string; time_end: string; n_exposures: number };
   coverage: number;
   bad_fraction: number;
   saturated_pixels: number;

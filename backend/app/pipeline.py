@@ -109,6 +109,23 @@ def stack_season(season: int, group: list[dict]) -> dict:
     }
 
 
+def difference(later: dict, first: dict) -> dict:
+    """A later visit minus the first visit (both already combined).
+
+    Anything that did not change cancels. An object that moved leaves a negative
+    spot where it was and a positive spot where it is now. Bright stars leave some
+    residue, because the two visits sample different wavelengths.
+    """
+    return {
+        **later,
+        "id": f"{later['id']}-minus-{first['id']}",
+        "image": later["image"] - first["image"],
+        "n_exposures": later["n_exposures"] + first["n_exposures"],
+        "minus": {k: first[k] for k in ("season", "time_start", "time_end", "n_exposures")},
+        "coverage": round(float(np.mean(np.isfinite(later["image"] - first["image"]))), 3),
+    }
+
+
 def _one_frame(exposure, ra, dec, half, grid, size):
     cut = archive.fetch_cutout(exposure, ra, dec, half)
     clean, stats = prepare.prepare(cut["image"], cut["flags"])
@@ -165,17 +182,28 @@ def build_frames(ra: float, dec: float, fov: float, band: int, mode: str = "expo
     progress(stage="render", message="Rendering frames")
     frames.sort(key=lambda f: f["mjd"])
     seasons = assign_seasons([f["mjd"] for f in frames])
-    if mode == "seasons":
+    signed = mode == "difference"
+    if mode in ("seasons", "difference"):
         items = [stack_season(s, [f for f, k in zip(frames, seasons) if k == s]) for s in sorted(set(seasons))]
+        if signed:
+            if len(items) == 1:
+                warnings.append("Only one visit covers this position, so there is nothing to subtract yet.")
+            items = [difference(later, items[0]) for later in items[1:]]
         noise = float(np.median([image_noise(i["image"]) for i in items])) if items else 0.0
     else:
         items = [single_frame(f, s) for f, s in zip(frames, seasons)]
         noise = float(np.median([f["noise"] for f in frames])) if frames else 0.0
-    low, high, soft = render.stretch_limits([i["image"] for i in items], noise)
+    if signed:
+        noise = noise or 1.0
+        low, high, soft = -12 * noise, 12 * noise, 2 * noise
+    else:
+        low, high, soft = render.stretch_limits([i["image"] for i in items], noise)
     out_dir.mkdir(parents=True, exist_ok=True)
     listing = []
     for i, item in enumerate(items):
-        (out_dir / f"{i:03d}.png").write_bytes(render.to_png(item.pop("image"), low, high, soft))
+        image = item.pop("image")
+        png = render.to_png_signed(image, high, soft) if signed else render.to_png(image, low, high, soft)
+        (out_dir / f"{i:03d}.png").write_bytes(png)
         listing.append({"index": i, **item, "png_url": f"/api/frame/{key}/{i:03d}.png"})
     season_list = [
         {"index": s, "start": group[0]["date"][:10], "end": group[-1]["date"][:10], "frames": len(group)}
@@ -187,7 +215,7 @@ def build_frames(ra: float, dec: float, fov: float, band: int, mode: str = "expo
         "key": key,
         "request": {"ra": ra, "dec": dec, "fov_arcmin": fov, "band": band, "mode": mode},
         "grid": {"size_px": size, "scale_arcsec": round(scale, 4), "orientation": "north up, east left"},
-        "stretch": {"low": low, "high": high, "unit": "MJy/sr", "scale": "asinh"},
+        "stretch": {"low": low, "high": high, "unit": "MJy/sr", "scale": "asinh", "signed": signed},
         "exposures_per_detector": per_detector,
         "exposures_in_band": len(in_band),
         "downloaded": downloaded,

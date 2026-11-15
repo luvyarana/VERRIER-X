@@ -1,5 +1,5 @@
 """Build the starter cache (backend/seed): finished frames and search results for the
-five test targets, every detector, both views, 10 arcminutes. The backend image ships with it, so
+five test targets, every detector, all three views, 10 arcminutes. The backend image ships with it, so
 these targets load at once after any restart and without the IRSA search.
 
 Run from the backend folder (takes a while; cutouts are cached in backend/cache):
@@ -50,7 +50,7 @@ def main() -> None:
         except Exception as exc:
             problems.append(f"{name} Gaia: {type(exc).__name__}: {exc}")
         for band in range(1, 7):
-            for mode in ("seasons", "exposures"):
+            for mode in ("seasons", "difference", "exposures"):
                 t0 = time.time()
                 try:
                     r = pipeline.build_frames(ra, dec, FOV, band, mode)

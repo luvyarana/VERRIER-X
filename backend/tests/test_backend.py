@@ -259,3 +259,28 @@ def test_gaia_stars_are_parsed_and_cached(tmp_path, monkeypatch):
     assert star["id"] == "4472832130942575872" and star["pmdec"] == 10362.39
     assert (faint["pmra"], faint["pmdec"], faint["parallax"]) == (0.0, 0.0, None)   # missing motion -> none
     assert first["epoch"] == 2016.0
+
+
+def test_difference_cancels_still_stars_and_shows_a_mover():
+    from PIL import Image
+
+    yy, xx = np.mgrid[:60, :60]
+
+    def star(x, y, peak=10.0):
+        return peak * np.exp(-((xx - x) ** 2 + (yy - y) ** 2) / 4)
+
+    def visit(season, mover_x):
+        return {"id": f"season-{season}", "season": season, "image": (star(15, 15) + star(mover_x, 40)).astype("f4"),
+                "n_exposures": 10, "time_start": "a", "time_end": "b"}
+
+    diff = pipeline.difference(visit(1, 36), visit(0, 30))
+    image = diff["image"]
+    assert abs(image[15, 15]) < 1e-5                 # the still star cancels
+    assert image[40, 36] > 5 and image[40, 30] < -5  # bright where the mover is now, dark where it was
+    assert diff["n_exposures"] == 20 and diff["minus"]["season"] == 0 and diff["season"] == 1
+
+    image[0, 0] = np.nan
+    pixels = np.array(Image.open(io.BytesIO(render.to_png_signed(image, 12.0, 2.0))))
+    assert pixels[59 - 15, 15] in (127, 128)         # no change is mid-grey (rows are flipped)
+    assert pixels[59 - 40, 36] > 200 and pixels[59 - 40, 30] < 55
+    assert pixels[59, 0] in (127, 128)               # no data is mid-grey too

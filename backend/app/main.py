@@ -51,8 +51,9 @@ def frames(
     fov: float = Query(config.FOV_DEFAULT_ARCMIN, ge=config.FOV_MIN_ARCMIN, le=config.FOV_MAX_ARCMIN,
                        description="Field of view, arcminutes"),
     band: int = Query(2, ge=1, le=6, description="Detector 1-6 (0.75-5.0 microns)"),
-    mode: str = Query("exposures", pattern="^(exposures|seasons)$",
-                      description="exposures: one frame per exposure; seasons: one combined frame per visit"),
+    mode: str = Query("exposures", pattern="^(exposures|seasons|difference)$",
+                      description="exposures: one frame per exposure; seasons: one combined frame per visit; "
+                                  "difference: each later visit minus the first"),
 ):
     """Frame list for a position. The first call starts the work and returns
     {"status": "working", ...}; repeat the same call until status is "done"."""

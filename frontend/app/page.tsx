@@ -26,7 +26,8 @@ function readUrl(): Query | null {
   const ra = parseRa(p.get("ra") ?? ""), dec = parseDec(p.get("dec") ?? "");
   if (ra == null || dec == null) return null;
   const fov = Number(p.get("fov")), band = Number(p.get("band"));
-  const mode: Mode = p.get("mode") === "exposures" ? "exposures" : "seasons";
+  const m = p.get("mode");
+  const mode: Mode = m === "exposures" || m === "difference" ? m : "seasons";
   return { ra, dec, fov: fov >= 2 && fov <= 60 ? fov : 10, band: band >= 1 && band <= 6 ? Math.round(band) : 2, mode };
 }
 
@@ -153,6 +154,7 @@ export default function Home() {
                 {(
                   [
                     ["seasons", "Visits combined"],
+                    ["difference", "Difference"],
                     ["exposures", "Every exposure"],
                   ] as [Mode, string][]
                 ).map(([m, label]) => (
@@ -212,7 +214,9 @@ export default function Home() {
             <div className="rounded-lg border border-slate-800 p-8 text-center text-slate-300">
               {result.exposures_in_band === 0 && Object.values(result.exposures_per_detector).every((n) => n === 0)
                 ? "SPHEREx has no public images of this position yet."
-                : "This detector has no usable images of this position. Try another detector."}
+                : result.request.mode === "difference" && result.exposures_in_band > 0
+                  ? "Only one visit covers this position with this detector, so there is nothing to subtract yet. Try another view or detector."
+                  : "This detector has no usable images of this position. Try another detector."}
             </div>
           )}
 

@@ -132,3 +132,10 @@ Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment chec
 - Checked on Barnard's Star: the amber Gaia marker (10.4″ per year) sits on the star in the August–September 2026 combined frame.
 - Epsilon Indi B and WISE 0855 are not in Gaia (too cool and faint), so they move with no marker, which is the case the tool is meant to reveal.
 - Gaia stars for the five targets are in the starter cache.
+
+## 11. Difference view (V11, 2026-11-15)
+
+- `mode=difference` returns each later visit minus the first visit, using the same per-visit median images as the combined view. Mid-grey is no change, white is brighter, black is fainter; the scale is ±12 times the noise.
+- Barnard's Star (detector 2) shows a clear pair: dark to the south where it was in August 2025, bright to the north where it is in 2026. Epsilon Indi B (detector 3) shows a small clean pair.
+- Still stars do not cancel perfectly. They leave small rings, because the two visits sample different wavelengths and the stars fall differently on the 6″ pixels. Very bright stars (and the halo of Epsilon Indi A) leave large residue.
+- The starter cache now holds all three views: 90 frame sets.
