@@ -24,6 +24,7 @@ export type Frame = {
   bad_fraction: number;
   saturated_pixels: number;
   target_flags: string[];
+  flag_fractions?: Record<string, number>;
   collection: string;
   png_url: string;
   source_url: string;
@@ -91,3 +92,43 @@ export function starOffset(star: GaiaStar, mjd: number, ra0: number, dec0: numbe
   const eta = (Math.cos(d0) * Math.sin(d) - Math.sin(d0) * Math.cos(d) * Math.cos(da)) / denom;
   return [(xi / RAD) * 3600, (eta / RAD) * 3600];
 }
+
+export type Resolved = { name: string; ra: number; dec: number; moved_arcsec: number; epoch: number };
+
+/** Look up an object name. Returns the position, or a message saying why not. */
+export async function resolveName(name: string): Promise<Resolved | string> {
+  try {
+    const res = await fetch(`${API_URL}/api/resolve?name=${encodeURIComponent(name)}`);
+    if (res.status === 404) return `No object called "${name}" was found. Check the spelling, or enter coordinates.`;
+    if (!res.ok) return "The name lookup service could not be reached. Enter coordinates instead.";
+    return res.json();
+  } catch {
+    return "The VERRIER-X server could not be reached.";
+  }
+}
+
+/** What each SPHEREx quality flag means, in plain words. */
+export const FLAG_MEANING: Record<string, string> = {
+  SOURCE: "a known star or galaxy (not a problem)",
+  TRANSIENT: "sudden jump during the exposure, usually a cosmic-ray hit",
+  OVERFLOW: "too bright for the detector",
+  NONLINEAR: "bright enough that the response is unreliable",
+  SUR_ERROR: "the signal ramp could not be fitted",
+  NONFUNC: "dead pixel",
+  HOT: "pixel with high dark current",
+  COLD: "pixel with low response",
+  DICHROIC: "low sensitivity at the edge of the band",
+  MISSING_DATA: "no data received",
+  FULLSAMPLE: "pixel read out in full for calibration",
+  PHANMISS: "reference correction missing",
+  PERSIST: "afterglow from an earlier bright exposure",
+  OUTLIER: "value disagrees with other exposures",
+  CROSSTALK: "electrical echo of a bright star",
+  GHOST: "optical reflection of a bright star",
+  GHOST_FPA: "reflection off the detector",
+  GHOST_EXT: "reflection from outside the field",
+  STREAK: "satellite trail",
+  BLOOM: "charge spilled from a saturated star",
+  SNOWBALL: "large cosmic-ray hit",
+  HALO: "ring around a cosmic-ray hit or trail",
+};

@@ -12,7 +12,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from . import config, overlays, pipeline
+from . import config, overlays, pipeline, resolve as resolver
 from .archive import ArchiveError
 
 app = FastAPI(title="VERRIER-X", version="0.1.0")
@@ -71,6 +71,17 @@ def frames(
                                 "message": "Starting"}
             threading.Thread(target=_run, args=(key, (ra, dec, fov, band, mode)), daemon=True).start()
     return job
+
+
+@app.get("/api/resolve")
+def resolve(name: str = Query(..., min_length=1, max_length=80)):
+    """Sky position for an object name (SIMBAD via CDS Sesame), moved to today's date."""
+    try:
+        return resolver.resolve(name)
+    except resolver.NotFound:
+        raise HTTPException(404, "No object with that name was found.")
+    except ArchiveError as exc:
+        raise HTTPException(503, str(exc))
 
 
 @app.get("/api/gaia")

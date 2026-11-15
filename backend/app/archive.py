@@ -90,7 +90,10 @@ def search(ra: float, dec: float) -> dict:
         except ArchiveError as exc:
             errors.append(str(exc))
     if errors and not seen:
-        raise ArchiveError("The SPHEREx archive search at IRSA is not responding (" + "; ".join(errors) + ")")
+        raise ArchiveError(
+            "NASA's SPHEREx archive search (IRSA) is not answering right now, so new positions cannot be "
+            "loaded. The five example targets still work. Please try again in a few minutes."
+        )
     return {"exposures": sorted(seen.values(), key=lambda e: e["mjd"]), "errors": errors}
 
 

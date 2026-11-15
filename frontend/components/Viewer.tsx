@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_URL, getGaia, starOffset, type Frame, type GaiaStar, type Result } from "@/lib/api";
+import { API_URL, FLAG_MEANING, getGaia, starOffset, type Frame, type GaiaStar, type Result } from "@/lib/api";
 
 const SEASON_COLOURS = ["#38bdf8", "#fbbf24", "#f472b6", "#4ade80", "#c084fc", "#fb923c"];
 const SPEEDS = [1, 2, 4, 8, 15];
@@ -296,6 +296,29 @@ export default function Viewer({ result }: { result: Result }) {
               </a>
             </dd>
           </dl>
+          {frame.flag_fractions && Object.keys(frame.flag_fractions).length > 0 && (
+            <div className="mt-4">
+              <h3 className="heading">Quality flags in this field</h3>
+              <ul className="space-y-1">
+                {Object.entries(frame.flag_fractions)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([name, share]) => (
+                    <li key={name} className="grid grid-cols-[4rem_1fr] gap-x-3">
+                      <span className="tabular-nums text-slate-300">
+                        {share >= 0.0995 ? `${(share * 100).toFixed(0)}%` : share >= 0.00095 ? `${(share * 100).toFixed(1)}%` : "<0.1%"}
+                      </span>
+                      <span>
+                        <span className="text-slate-200">{name.toLowerCase().replaceAll("_", " ")}</span>
+                        <span className="text-slate-500">: {FLAG_MEANING[name] ?? "see the SPHEREx documentation"}</span>
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+              <p className="mt-2 text-xs text-slate-500">
+                Share of pixels carrying each flag{stacked ? ", averaged over the exposures used" : ""}. Flagged bad pixels are repaired for display.
+              </p>
+            </div>
+          )}
           <p className="mt-2 text-xs text-slate-500">
             {stacked
               ? "The exposures in a visit are at different wavelengths within this detector's range, so a combined frame is a broad-band image."

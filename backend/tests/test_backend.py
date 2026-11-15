@@ -219,6 +219,7 @@ def test_season_stack_removes_one_off_artefacts_and_lowers_noise():
         group.append({"image": image, "mjd": 60900.0 + i, "date": f"2025-08-{13 + i:02d}T00:00:00",
                       "wavelength_um": 1.1 + 0.03 * i, "bad_fraction": 0.01, "saturated_pixels": 0,
                       "target_flags": ["SOURCE"] if i % 2 else [],
+                      "flag_fractions": {"SOURCE": 0.4, "HOT": 0.02} if i % 2 else {"SOURCE": 0.2},
                       "exposure": {"detector": 2, "collection": "spherex_dr1", "irsa_url": "u", "id": str(i)}})
     stack = pipeline.stack_season(1, group)
     image = stack["image"]
@@ -229,6 +230,8 @@ def test_season_stack_removes_one_off_artefacts_and_lowers_noise():
     assert (stack["wavelength_min_um"], stack["wavelength_max_um"]) == (1.1, 1.52)
     assert stack["time_start"].startswith("2025-08-13") and stack["time_end"].startswith("2025-08-27")
     assert stack["target_flags"] == ["SOURCE"]
+    assert stack["flag_fractions"]["SOURCE"] == pytest.approx(0.2933, abs=1e-3)   # mean over the visit
+    assert stack["flag_fractions"]["HOT"] == pytest.approx(0.02 * 7 / 15, abs=1e-3)
 
 
 def test_gaia_stars_are_parsed_and_cached(tmp_path, monkeypatch):
@@ -284,3 +287,28 @@ def test_difference_cancels_still_stars_and_shows_a_mover():
     assert pixels[59 - 15, 15] in (127, 128)         # no change is mid-grey (rows are flipped)
     assert pixels[59 - 40, 36] > 200 and pixels[59 - 40, 30] < 55
     assert pixels[59, 0] in (127, 128)               # no data is mid-grey too
+
+
+def test_flag_fractions():
+    flags = np.zeros((10, 10), "i4")
+    flags[:5] |= 1 << prepare.FLAG_BITS["SOURCE"]
+    flags[0, 0] |= 1 << prepare.FLAG_BITS["HOT"]
+    assert prepare.flag_fractions(flags) == {"HOT": 0.01, "SOURCE": 0.5}
+
+
+def test_name_lookup_moves_a_fast_star_to_the_given_date():
+    from app import resolve
+
+    xml = """<Sesame><Target><name>Barnard's Star</name><Resolver name="Sc=Simbad">
+      <jradeg>269.45207696</jradeg><jdedeg>4.69336497</jdedeg>
+      <pm><v>10393.349</v><pmRA>-801.551</pmRA><epmRA>0.032</epmRA><pmDE>10362.394</pmDE></pm>
+    </Resolver></Target></Sesame>"""
+    found = resolve.move_to(resolve.parse_sesame(xml), 2026.0)
+    assert found["ra"] == pytest.approx(269.44627, abs=2e-5) and found["dec"] == pytest.approx(4.76820, abs=2e-5)
+    assert found["moved_arcsec"] == pytest.approx(270.2, abs=0.2)
+
+    galaxy = resolve.move_to(resolve.parse_sesame("<jradeg>10.6847</jradeg><jdedeg>41.2690</jdedeg>"), 2026.0)
+    assert (galaxy["ra"], galaxy["dec"], galaxy["moved_arcsec"]) == (10.6847, 41.269, 0.0)
+
+    with pytest.raises(resolve.NotFound):
+        resolve.parse_sesame("<Sesame><Target><INFO>Nothing found</INFO></Target></Sesame>")

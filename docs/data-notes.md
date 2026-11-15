@@ -139,3 +139,10 @@ Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment chec
 - Barnard's Star (detector 2) shows a clear pair: dark to the south where it was in August 2025, bright to the north where it is in 2026. Epsilon Indi B (detector 3) shows a small clean pair.
 - Still stars do not cancel perfectly. They leave small rings, because the two visits sample different wavelengths and the stars fall differently on the 6″ pixels. Very bright stars (and the halo of Epsilon Indi A) leave large residue.
 - The starter cache now holds all three views: 90 frame sets.
+
+## 12. Name search, flag panel and message states (V15, V09, V16, 2026-11-15)
+
+- `GET /api/resolve?name=` looks a name up in SIMBAD through CDS Sesame (mirrors at CfA and IDIA, then CDS itself). SIMBAD positions are for epoch 2000, so a star with a known proper motion is moved to today's date: Barnard's Star by 279″, Wolf 359 by 127″.
+- Each frame now lists every quality flag present in the field with the share of pixels carrying it; the page adds a plain-language meaning for each.
+- Message states checked in the browser against a stand-in server: no images anywhere, no images in this detector, only one visit (difference view), archive search down, server error, server unreachable, name not found.
+- **IRSA's image search returned 502 errors through the afternoon of 15 November.** While it is down, only positions already in the cache load; new positions show the "archive is not answering" message with a retry button. The five test targets are unaffected because they ship with the backend.

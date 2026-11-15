@@ -12,13 +12,14 @@ Try it on a fast-moving star: [Barnard's Star](https://frontend-ivory-one-19.ver
 ## What it does
 
 - Takes RA and Dec in degrees or in hours/degrees, minutes and seconds, and a field of view from 5 to 60 arcminutes.
+- Or takes an object name (looked up in SIMBAD) and moves a fast star from its catalogue position to where it is today.
 - Finds every public SPHEREx exposure of that position (Data Release 1 and Quick Release 3, April 2025 to October 2026).
 - Lines the images up north-up on one grid, so stars stay on the same pixel from frame to frame.
 - Combines each visit's exposures into one deeper frame and blinks between visits ("Visits combined"), or plays every exposure as a movie coloured by observing season. Anything that jumps between visits has moved.
 - Subtracts the first visit from each later one ("Difference"), so still stars cancel and a moving object shows as a dark spot next to a bright one.
 - Lets you pick one of the six SPHEREx detectors (0.75 to 5.0 microns) and labels every frame with its date and wavelength.
 - Marks known stars from ESA's Gaia DR3 catalogue, each moved to the date of the frame. A fast star's marker travels with it; something that moves with no marker is not in Gaia.
-- Shows the quality flags at the centre of each frame and links to the original file.
+- Lists the quality flags in each frame with what they mean and how much of the field they cover, and links to the original file.
 - Keeps the position in the link, so a view can be shared.
 
 ## How it works
@@ -70,5 +71,7 @@ This project uses data products from the Spectro-Photometer for the History of t
 This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology.
 
 This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC). The Gaia catalogue is read through the TAP service of the German Astrophysical Virtual Observatory (GAVO).
+
+Object names are resolved with the Sesame service of the Centre de Données astronomiques de Strasbourg (CDS), which queries the SIMBAD database.
 
 Software: Astropy, reproject, NumPy, SciPy, Pillow, FastAPI, Next.js, React, Tailwind CSS.

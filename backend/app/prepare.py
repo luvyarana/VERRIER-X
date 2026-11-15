@@ -28,6 +28,16 @@ def flag_names(value: int) -> list[str]:
     return [name for name, bit in FLAG_BITS.items() if value >> bit & 1]
 
 
+def flag_fractions(flags: np.ndarray) -> dict[str, float]:
+    """Share of pixels carrying each flag (only flags that occur), e.g. {"SOURCE": 0.31}."""
+    out = {}
+    for name, bit in FLAG_BITS.items():
+        share = round(float(np.mean((flags >> bit) & 1)), 4)
+        if share > 0:
+            out[name] = share
+    return out
+
+
 def background(image: np.ndarray, usable: np.ndarray) -> tuple[float, float]:
     """Sigma-clipped median and noise (from the median absolute deviation) of the sky."""
     values = image[usable]

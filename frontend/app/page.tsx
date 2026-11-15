@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Viewer from "@/components/Viewer";
-import { DETECTORS, getFrames, type Mode, type Query, type Result, type Working } from "@/lib/api";
+import { DETECTORS, getFrames, resolveName, type Mode, type Query, type Result, type Working } from "@/lib/api";
 import { formatDec, formatRa, parseDec, parseRa } from "@/lib/coords";
 
 // Positions of the challenge's test targets at epoch 2026.0 (catalogue position moved by proper motion; see docs/targets.md).
@@ -39,6 +39,26 @@ export default function Home() {
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<State>({ kind: "idle" });
   const [formError, setFormError] = useState("");
+  const [nameText, setNameText] = useState("");
+  const [nameNote, setNameNote] = useState("");
+  const [looking, setLooking] = useState(false);
+
+  const lookUp = async () => {
+    const name = nameText.trim();
+    if (!name || looking) return;
+    setLooking(true);
+    setNameNote("");
+    setFormError("");
+    const found = await resolveName(name);
+    setLooking(false);
+    if (typeof found === "string") return setFormError(found);
+    setNameNote(
+      found.moved_arcsec >= 1
+        ? `${found.name}: moved ${found.moved_arcsec.toFixed(0)}″ from its year-2000 catalogue position to where it is now, using its known motion.`
+        : `${found.name}: found.`,
+    );
+    run({ ra: found.ra, dec: found.dec, fov, band: query?.band ?? 2, mode: query?.mode ?? "seasons" });
+  };
 
   const run = (q: Query, push = true) => {
     setRaText(String(q.ra));
@@ -111,6 +131,28 @@ export default function Home() {
       </header>
 
       <form onSubmit={submit} className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+        <div className="mb-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <label className="text-sm text-slate-400">
+            Object name
+            <input
+              className="field mt-1"
+              value={nameText}
+              onChange={(e) => setNameText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  lookUp();
+                }
+              }}
+              placeholder="for example Proxima Centauri, M31, Wolf 359"
+            />
+          </label>
+          <button type="button" onClick={lookUp} disabled={looking || !nameText.trim()} className="btn !py-2">
+            {looking ? "Looking up…" : "Find by name"}
+          </button>
+        </div>
+        {nameNote && <p className="-mt-1 mb-3 text-sm text-emerald-300">{nameNote}</p>}
+        <p className="mb-2 text-xs text-slate-500">Or enter coordinates:</p>
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
           <label className="text-sm text-slate-400">
             Right ascension

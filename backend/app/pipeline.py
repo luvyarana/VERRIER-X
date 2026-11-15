@@ -64,6 +64,7 @@ def single_frame(frame: dict, season: int) -> dict:
         "bad_fraction": round(frame["bad_fraction"], 4),
         "saturated_pixels": frame["saturated_pixels"],
         "target_flags": frame["target_flags"],
+        "flag_fractions": frame["flag_fractions"],
         "collection": e["collection"],
         "source_url": e["irsa_url"],
         "image": frame["image"],
@@ -103,6 +104,10 @@ def stack_season(season: int, group: list[dict]) -> dict:
         "bad_fraction": round(float(np.mean([f["bad_fraction"] for f in group])), 4),
         "saturated_pixels": int(np.median([f["saturated_pixels"] for f in group])),
         "target_flags": sorted({name for f in group for name in f["target_flags"]}),
+        "flag_fractions": {
+            name: round(float(np.mean([f["flag_fractions"].get(name, 0.0) for f in group])), 4)
+            for name in sorted({n for f in group for n in f["flag_fractions"]})
+        },
         "collection": first["collection"],
         "source_url": first["irsa_url"],
         "image": image,
@@ -138,6 +143,7 @@ def _one_frame(exposure, ra, dec, half, grid, size):
         "image": aligned,
         "coverage": float(np.mean(np.isfinite(aligned))),
         "target_flags": prepare.flag_names(int(cut["flags"][ty, tx])) if inside else [],
+        "flag_fractions": prepare.flag_fractions(cut["flags"]),
         "cached": cut["cached"],
         **{k: cut[k] for k in ("mjd", "date", "wavelength_um", "bandwidth_um")},
         **stats,
