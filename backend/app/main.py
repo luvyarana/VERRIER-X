@@ -56,8 +56,8 @@ def frames(
     """Frame list for a position. The first call starts the work and returns
     {"status": "working", ...}; repeat the same call until status is "done"."""
     key = pipeline.request_key(ra, dec, fov, band, mode)
-    path = pipeline.result_path(key)
-    if path.exists():
+    path = config.find(f"frames/{key}/result.json")
+    if path:
         return json.loads(path.read_text())
     with _lock:
         job = _jobs.get(key)
@@ -75,7 +75,7 @@ def frames(
 def frame(key: str, name: str):
     if not re.fullmatch(r"[0-9a-f]{16}", key) or not re.fullmatch(r"\d{3}", name):
         raise HTTPException(404)
-    path = config.CACHE_DIR / "frames" / key / f"{name}.png"
-    if not path.exists():
+    path = config.find(f"frames/{key}/{name}.png")
+    if not path:
         raise HTTPException(404)
     return FileResponse(path, media_type="image/png", headers={"Cache-Control": "public, max-age=31536000, immutable"})

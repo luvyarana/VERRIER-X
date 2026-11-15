@@ -37,9 +37,11 @@ class ArchiveError(RuntimeError):
 
 def _search_one(collection: str, ra: float, dec: float) -> list[dict]:
     """Search one collection, using the disk cache when it is fresh."""
-    path = config.CACHE_DIR / "search" / f"{collection}_{ra:.4f}_{dec:.4f}.json"
-    if path.exists() and time.time() - path.stat().st_mtime < config.SEARCH_TTL_DAYS * 86400:
-        return json.loads(path.read_text())
+    name = f"search/{collection}_{ra:.4f}_{dec:.4f}.json"
+    path = config.CACHE_DIR / name
+    known = config.find(name)
+    if known and time.time() - known.stat().st_mtime < config.SEARCH_TTL_DAYS * 86400:
+        return json.loads(known.read_text())
     params = {"COLLECTION": collection, "POS": f"circle {ra} {dec} {config.SEARCH_RADIUS_DEG}"}
     last = "no attempt"
     for attempt in range(config.SEARCH_TRIES):
@@ -64,8 +66,8 @@ def _search_one(collection: str, ra: float, dec: float) -> list[dict]:
         except (requests.RequestException, ValueError, KeyError) as exc:
             last = type(exc).__name__
         time.sleep(2 * (attempt + 1))
-    if path.exists():  # a stale answer is better than none
-        return json.loads(path.read_text())
+    if known:  # a stale answer is better than none
+        return json.loads(known.read_text())
     raise ArchiveError(f"{collection}: {last}")
 
 

@@ -12,6 +12,19 @@ S3_PREFIX = "https://nasa-irsa-spherex.s3.us-east-1.amazonaws.com/"
 
 CACHE_DIR = Path(os.environ.get("VERRIER_CACHE", Path(__file__).resolve().parents[1] / "cache"))
 
+# Starter cache shipped inside the image: search results and finished frames for the
+# test targets. It is read-only and survives restarts; CACHE_DIR is checked first.
+SEED_DIR = Path(os.environ.get("VERRIER_SEED", Path(__file__).resolve().parents[1] / "seed"))
+
+
+def find(relative: str) -> Path | None:
+    """Path of a cached file, looking in the live cache and then the starter cache."""
+    for base in (CACHE_DIR, SEED_DIR):
+        if (base / relative).exists():
+            return base / relative
+    return None
+
+
 SEARCH_RADIUS_DEG = 0.003      # the target itself must be inside the exposure
 SEARCH_TTL_DAYS = 7            # how long a cached search result is trusted
 SEARCH_TRIES = 4

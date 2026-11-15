@@ -183,3 +183,25 @@ def test_api_rejects_bad_input_and_serves_cached_result(tmp_path, monkeypatch):
     (path.parent / "000.png").write_bytes(b"png")
     assert client.get("/api/frames", params={"ra": 10, "dec": 0}).json() == {"status": "done", "frames": []}
     assert client.get(f"/api/frame/{key}/000.png").content == b"png"
+
+
+def test_starter_cache_is_used_when_the_live_cache_is_empty(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import config, main
+
+    monkeypatch.setattr(config, "CACHE_DIR", tmp_path / "cache")
+    monkeypatch.setattr(config, "SEED_DIR", tmp_path / "seed")
+    key = pipeline.request_key(20.0, 5.0, 10.0, 2, "exposures")
+    folder = tmp_path / "seed" / "frames" / key
+    folder.mkdir(parents=True)
+    (folder / "result.json").write_text('{"status": "done", "frames": []}')
+    (folder / "000.png").write_bytes(b"png")
+    search = tmp_path / "seed" / "search"
+    search.mkdir()
+    (search / "spherex_dr1_20.0000_5.0000.json").write_text("[]")
+
+    client = TestClient(main.app)
+    assert client.get("/api/frames", params={"ra": 20, "dec": 5}).json()["status"] == "done"
+    assert client.get(f"/api/frame/{key}/000.png").content == b"png"
+    assert archive._search_one("spherex_dr1", 20.0, 5.0) == []  # no network call
