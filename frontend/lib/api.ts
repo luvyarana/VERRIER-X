@@ -2,7 +2,8 @@
 const DEFAULT_API = process.env.NODE_ENV === "production" ? "https://verrier-x-api.onrender.com" : "http://localhost:8000";
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API).replace(/\/$/, "");
 
-export type Query = { ra: number; dec: number; fov: number; band: number };
+export type Mode = "seasons" | "exposures";
+export type Query = { ra: number; dec: number; fov: number; band: number; mode: Mode };
 
 export type Frame = {
   index: number;
@@ -13,6 +14,11 @@ export type Frame = {
   detector: number;
   wavelength_um: number | null;
   bandwidth_um: number | null;
+  wavelength_min_um?: number | null;
+  wavelength_max_um?: number | null;
+  time_start?: string;
+  time_end?: string;
+  n_exposures: number;
   coverage: number;
   bad_fraction: number;
   saturated_pixels: number;
@@ -27,7 +33,7 @@ export type Season = { index: number; start: string; end: string; frames: number
 export type Result = {
   status: "done";
   key: string;
-  request: { ra: number; dec: number; fov_arcmin: number; band: number };
+  request: { ra: number; dec: number; fov_arcmin: number; band: number; mode: Mode };
   grid: { size_px: number; scale_arcsec: number };
   exposures_per_detector: Record<string, number>;
   exposures_in_band: number;
@@ -51,7 +57,7 @@ export const DETECTORS: { id: number; range: string }[] = [
 ];
 
 export async function getFrames(q: Query, signal: AbortSignal): Promise<Result | Working | Failed> {
-  const params = new URLSearchParams({ ra: String(q.ra), dec: String(q.dec), fov: String(q.fov), band: String(q.band) });
+  const params = new URLSearchParams({ ra: String(q.ra), dec: String(q.dec), fov: String(q.fov), band: String(q.band), mode: q.mode });
   const res = await fetch(`${API_URL}/api/frames?${params}`, { signal });
   if (res.status === 422) return { status: "error", message: "Those coordinates or settings are out of range." };
   if (!res.ok) return { status: "error", message: `The server answered with an error (${res.status}).` };

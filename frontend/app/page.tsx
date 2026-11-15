@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Viewer from "@/components/Viewer";
-import { DETECTORS, getFrames, type Query, type Result, type Working } from "@/lib/api";
+import { DETECTORS, getFrames, type Mode, type Query, type Result, type Working } from "@/lib/api";
 import { formatDec, formatRa, parseDec, parseRa } from "@/lib/coords";
 
 // Approximate 2026 positions of the challenge's test targets.
@@ -26,7 +26,8 @@ function readUrl(): Query | null {
   const ra = parseRa(p.get("ra") ?? ""), dec = parseDec(p.get("dec") ?? "");
   if (ra == null || dec == null) return null;
   const fov = Number(p.get("fov")), band = Number(p.get("band"));
-  return { ra, dec, fov: fov >= 2 && fov <= 60 ? fov : 10, band: band >= 1 && band <= 6 ? Math.round(band) : 2 };
+  const mode: Mode = p.get("mode") === "exposures" ? "exposures" : "seasons";
+  return { ra, dec, fov: fov >= 2 && fov <= 60 ? fov : 10, band: band >= 1 && band <= 6 ? Math.round(band) : 2, mode };
 }
 
 export default function Home() {
@@ -47,7 +48,7 @@ export default function Home() {
     setState({ kind: "working", progress: null });
     setAttempt((n) => n + 1);
     if (push) {
-      const url = `?ra=${q.ra}&dec=${q.dec}&fov=${q.fov}&band=${q.band}`;
+      const url = `?ra=${q.ra}&dec=${q.dec}&fov=${q.fov}&band=${q.band}&mode=${q.mode}`;
       window.history.pushState(null, "", url);
     }
   };
@@ -91,7 +92,7 @@ export default function Home() {
     const ra = parseRa(raText), dec = parseDec(decText);
     if (ra == null) return setFormError("Right ascension should be 0 to 360 degrees, or hours like 17h 57m 48s.");
     if (dec == null) return setFormError("Declination should be −90 to +90 degrees, like −7d 14m 42s.");
-    run({ ra: Number(ra.toFixed(5)), dec: Number(dec.toFixed(5)), fov, band: query?.band ?? 2 });
+    run({ ra: Number(ra.toFixed(5)), dec: Number(dec.toFixed(5)), fov, band: query?.band ?? 2, mode: query?.mode ?? "seasons" });
   };
 
   const result = state.kind === "done" ? state.result : null;
@@ -132,7 +133,7 @@ export default function Home() {
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-slate-500">Try:</span>
           {TARGETS.map((t) => (
-            <button key={t.name} type="button" onClick={() => run({ ra: t.ra, dec: t.dec, fov, band: t.band })} className="btn !py-1">
+            <button key={t.name} type="button" onClick={() => run({ ra: t.ra, dec: t.dec, fov, band: t.band, mode: query?.mode ?? "seasons" })} className="btn !py-1">
               {t.name}
             </button>
           ))}
@@ -146,6 +147,26 @@ export default function Home() {
               <span className="font-mono text-slate-200">{formatRa(query.ra)}</span>{" "}
               <span className="font-mono text-slate-200">{formatDec(query.dec)}</span> · {query.fov}′ across
             </p>
+            <div>
+              <div className="heading !mb-1">View</div>
+              <div className="flex gap-1">
+                {(
+                  [
+                    ["seasons", "Visits combined"],
+                    ["exposures", "Every exposure"],
+                  ] as [Mode, string][]
+                ).map(([m, label]) => (
+                  <button
+                    key={m}
+                    onClick={() => run({ ...query, mode: m })}
+                    aria-pressed={query.mode === m}
+                    className={`rounded-md border px-2.5 py-1 text-sm ${query.mode === m ? "border-cyan-400 bg-cyan-500/15 text-cyan-300" : "border-slate-700 text-slate-300 hover:bg-slate-800"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div>
               <div className="heading !mb-1">Detector (wavelength in microns)</div>
               <div className="flex flex-wrap gap-1">

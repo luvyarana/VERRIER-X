@@ -6,6 +6,10 @@ import { API_URL, type Frame, type Result } from "@/lib/api";
 const SEASON_COLOURS = ["#38bdf8", "#fbbf24", "#f472b6", "#4ade80", "#c084fc", "#fb923c"];
 const SPEEDS = [1, 2, 4, 8, 15];
 
+function dateRange(a: string, b: string) {
+  return niceDate(a) === niceDate(b) ? niceDate(a) : `${niceDate(a)} – ${niceDate(b)}`;
+}
+
 function niceDate(iso: string) {
   const d = new Date(iso + "Z");
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
@@ -18,7 +22,8 @@ export default function Viewer({ result }: { result: Result }) {
   const [loaded, setLoaded] = useState(0);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [fps, setFps] = useState(4);
+  const stacked = result.request.mode === "seasons";
+  const [fps, setFps] = useState(stacked ? 1 : 4);
   const [marker, setMarker] = useState(true);
   const ready = loaded >= frames.length;
   const frame: Frame | undefined = frames[Math.min(index, frames.length - 1)];
@@ -122,8 +127,12 @@ export default function Viewer({ result }: { result: Result }) {
             </div>
           )}
           <div className="pointer-events-none absolute left-3 top-3 rounded bg-black/60 px-2 py-1 text-sm font-medium" style={{ color: colour }}>
-            {niceDate(frame.time)}
-            {frame.wavelength_um != null && <span className="text-slate-200"> · {frame.wavelength_um.toFixed(2)} µm</span>}
+            {stacked && frame.time_start && frame.time_end ? dateRange(frame.time_start, frame.time_end) : niceDate(frame.time)}
+            {stacked ? (
+              <span className="text-slate-200"> · {frame.n_exposures} exposures combined</span>
+            ) : (
+              frame.wavelength_um != null && <span className="text-slate-200"> · {frame.wavelength_um.toFixed(2)} µm</span>
+            )}
           </div>
         </div>
 
@@ -133,7 +142,7 @@ export default function Viewer({ result }: { result: Result }) {
             <button
               key={f.index}
               onClick={() => (setPlaying(false), setIndex(f.index))}
-              title={`${niceDate(f.time)}`}
+              title={stacked && f.time_start && f.time_end ? dateRange(f.time_start, f.time_end) : niceDate(f.time)}
               className="h-full min-w-0 flex-1 rounded-[1px] transition-opacity"
               style={{ background: SEASON_COLOURS[f.season % SEASON_COLOURS.length], opacity: f.index === index ? 1 : 0.3 }}
             />
@@ -177,14 +186,16 @@ export default function Viewer({ result }: { result: Result }) {
                 >
                   <span className="h-3 w-3 shrink-0 rounded-sm" style={{ background: SEASON_COLOURS[s.index % SEASON_COLOURS.length] }} />
                   <span>{niceDate(s.start)}{s.end !== s.start && ` – ${niceDate(s.end)}`}</span>
-                  <span className="ml-auto text-slate-500">{s.frames} {s.frames === 1 ? "frame" : "frames"}</span>
+                  <span className="ml-auto text-slate-500">{s.frames} {s.frames === 1 ? "exposure" : "exposures"}</span>
                 </button>
               </li>
             ))}
           </ul>
           {seasons.length > 1 && (
             <p className="mt-2 text-xs text-slate-500">
-              Anything that jumps when the colour changes has moved between visits. Stars that stay put are far away.
+              {stacked
+                ? "Each frame is one visit, with all its exposures combined into a deeper image. Anything that jumps from frame to frame has moved between visits."
+                : "Anything that jumps when the colour changes has moved between visits. Stars that stay put are far away."}
             </p>
           )}
         </section>
@@ -192,12 +203,26 @@ export default function Viewer({ result }: { result: Result }) {
         <section>
           <h2 className="heading">This frame</h2>
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-            <dt className="text-slate-500">Time (UTC)</dt>
-            <dd className="tabular-nums">{frame.time.replace("T", " ").slice(0, 19)}</dd>
+            <dt className="text-slate-500">{stacked ? "Dates (UTC)" : "Time (UTC)"}</dt>
+            <dd className="tabular-nums">
+              {stacked && frame.time_start && frame.time_end
+                ? `${frame.time_start.slice(0, 10)} to ${frame.time_end.slice(0, 10)}`
+                : frame.time.replace("T", " ").slice(0, 19)}
+            </dd>
+            {stacked && (
+              <>
+                <dt className="text-slate-500">Combined</dt>
+                <dd>{frame.n_exposures} exposures (median)</dd>
+              </>
+            )}
             <dt className="text-slate-500">Wavelength</dt>
             <dd>
-              {frame.wavelength_um != null ? `${frame.wavelength_um.toFixed(3)} µm` : "not available"}
-              {frame.bandwidth_um != null && <span className="text-slate-500"> (width {frame.bandwidth_um.toFixed(3)} µm)</span>}
+              {stacked && frame.wavelength_min_um != null && frame.wavelength_max_um != null
+                ? `${frame.wavelength_min_um.toFixed(2)} to ${frame.wavelength_max_um.toFixed(2)} µm`
+                : frame.wavelength_um != null
+                  ? `${frame.wavelength_um.toFixed(3)} µm`
+                  : "not available"}
+              {!stacked && frame.bandwidth_um != null && <span className="text-slate-500"> (width {frame.bandwidth_um.toFixed(3)} µm)</span>}
             </dd>
             <dt className="text-slate-500">Detector</dt>
             <dd>{frame.detector}</dd>
@@ -205,15 +230,17 @@ export default function Viewer({ result }: { result: Result }) {
             <dd>{frame.target_flags.length ? frame.target_flags.join(", ").toLowerCase().replaceAll("_", " ") : "none"}</dd>
             <dt className="text-slate-500">Repaired pixels</dt>
             <dd>{(frame.bad_fraction * 100).toFixed(1)}% of the field</dd>
-            <dt className="text-slate-500">Source file</dt>
+            <dt className="text-slate-500">{stacked ? "Source files" : "Source file"}</dt>
             <dd className="min-w-0">
               <a href={frame.source_url} className="break-all text-cyan-400 hover:underline" target="_blank" rel="noreferrer">
-                {frame.id}
+                {stacked ? `first of ${frame.n_exposures} exposures` : frame.id}
               </a>
             </dd>
           </dl>
           <p className="mt-2 text-xs text-slate-500">
-            Each exposure sees this spot through a different part of the filter, so the wavelength changes from frame to frame and stars change brightness.
+            {stacked
+              ? "The exposures in a visit are at different wavelengths within this detector's range, so a combined frame is a broad-band image."
+              : "Each exposure sees this spot through a different part of the filter, so the wavelength changes from frame to frame and stars change brightness."}
           </p>
         </section>
       </div>

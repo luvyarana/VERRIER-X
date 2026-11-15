@@ -1,5 +1,5 @@
 """Build the starter cache (backend/seed): finished frames and search results for the
-five test targets, every detector, 10 arcminutes. The backend image ships with it, so
+five test targets, every detector, both views, 10 arcminutes. The backend image ships with it, so
 these targets load at once after any restart and without the IRSA search.
 
 Run from the backend folder (takes a while; cutouts are cached in backend/cache):
@@ -41,18 +41,19 @@ def main() -> None:
             (seed / "search").mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, seed / "search" / src.name)
         for band in range(1, 7):
-            t0 = time.time()
-            try:
-                r = pipeline.build_frames(ra, dec, FOV, band)
-            except Exception as exc:
-                problems.append(f"{name} detector {band}: {type(exc).__name__}: {exc}")
-                continue
-            src = pipeline.result_path(r["key"]).parent
-            shutil.copytree(src, seed / "frames" / r["key"], dirs_exist_ok=True)
-            print(f"  detector {band}: {len(r['frames']):3d} frames, {len(r['seasons'])} seasons, "
-                  f"{time.time() - t0:4.0f} s {r['warnings'] or ''}", flush=True)
-            if any("could not be read" in w for w in r["warnings"]):
-                problems.append(f"{name} detector {band}: {r['warnings']}")
+            for mode in ("seasons", "exposures"):
+                t0 = time.time()
+                try:
+                    r = pipeline.build_frames(ra, dec, FOV, band, mode)
+                except Exception as exc:
+                    problems.append(f"{name} detector {band} {mode}: {type(exc).__name__}: {exc}")
+                    continue
+                src = pipeline.result_path(r["key"]).parent
+                shutil.copytree(src, seed / "frames" / r["key"], dirs_exist_ok=True)
+                print(f"  detector {band} {mode:9s}: {len(r['frames']):3d} frames, {len(r['seasons'])} seasons, "
+                      f"{time.time() - t0:4.0f} s {r['warnings'] or ''}", flush=True)
+                if any("could not be read" in w for w in r["warnings"]):
+                    problems.append(f"{name} detector {band} {mode}: {r['warnings']}")
     print("problems:", problems or "none", flush=True)
 
 

@@ -173,6 +173,7 @@ def test_api_rejects_bad_input_and_serves_cached_result(tmp_path, monkeypatch):
     assert client.get("/api/frames", params={"ra": 400, "dec": 0}).status_code == 422
     assert client.get("/api/frames", params={"ra": 10, "dec": 0, "fov": 500}).status_code == 422
     assert client.get("/api/frames", params={"ra": 10, "dec": 0, "band": 7}).status_code == 422
+    assert client.get("/api/frames", params={"ra": 10, "dec": 0, "mode": "nonsense"}).status_code == 422
     assert client.get("/api/frame/../../etc/passwd.png").status_code == 404
     assert client.get("/api/frame/0123456789abcdef/000.png").status_code == 404
 
@@ -205,3 +206,26 @@ def test_starter_cache_is_used_when_the_live_cache_is_empty(tmp_path, monkeypatc
     assert client.get("/api/frames", params={"ra": 20, "dec": 5}).json()["status"] == "done"
     assert client.get(f"/api/frame/{key}/000.png").content == b"png"
     assert archive._search_one("spherex_dr1", 20.0, 5.0) == []  # no network call
+
+
+def test_season_stack_removes_one_off_artefacts_and_lowers_noise():
+    rng = np.random.default_rng(3)
+    group = []
+    for i in range(15):
+        image = rng.normal(0, 1, (40, 40)).astype("f4")
+        image[20, 20] += 3          # a faint star, hidden in the noise of one exposure
+        if i == 4:
+            image[5, 5] = 1000      # an artefact in a single exposure
+        group.append({"image": image, "mjd": 60900.0 + i, "date": f"2025-08-{13 + i:02d}T00:00:00",
+                      "wavelength_um": 1.1 + 0.03 * i, "bad_fraction": 0.01, "saturated_pixels": 0,
+                      "target_flags": ["SOURCE"] if i % 2 else [],
+                      "exposure": {"detector": 2, "collection": "spherex_dr1", "irsa_url": "u", "id": str(i)}})
+    stack = pipeline.stack_season(1, group)
+    image = stack["image"]
+    assert abs(image[5, 5]) < 2                       # the artefact is gone
+    assert pipeline.image_noise(image) < 0.45         # about 1 / sqrt(15) * 1.25
+    assert image[20, 20] > 5 * pipeline.image_noise(image)  # the star now stands out
+    assert stack["n_exposures"] == 15 and stack["season"] == 1
+    assert (stack["wavelength_min_um"], stack["wavelength_max_um"]) == (1.1, 1.52)
+    assert stack["time_start"].startswith("2025-08-13") and stack["time_end"].startswith("2025-08-27")
+    assert stack["target_flags"] == ["SOURCE"]

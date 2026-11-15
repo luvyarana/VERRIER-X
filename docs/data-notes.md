@@ -107,3 +107,13 @@ Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment chec
 - **Repaired pixels:** TRANSIENT, SUR_ERROR, NONFUNC, MISSING_DATA, HOT, COLD, PHANMISS and SNOWBALL pixels are replaced by the median of their neighbours. OVERFLOW and NONLINEAR pixels (cores of very bright stars) are replaced by their brightest neighbour. OUTLIER is left alone, because a moving object might be flagged as one.
 - **An incomplete search is not cached.** If part of the IRSA search fails, the answer is returned with a warning and rebuilt on the next request.
 - **Known display problem:** some frames have a bright band across part of the field (seen in one Barnard's Star frame from August 2025). Not yet handled.
+
+## 8. Combined visits (V10, 2026-11-15)
+
+- The API has a second view, `mode=seasons`: all exposures of one visit (same detector) are combined into one frame by taking the median of each pixel. The page calls this "Visits combined" and opens in it by default; "Every exposure" is the original view.
+- A combined frame mixes the wavelengths within the detector's range, so it is a broad-band image. Its label gives the date range, the number of exposures and the wavelength range.
+- Noise falls roughly with the square root of the number of exposures, and one-off artefacts (cosmic-ray hits, the bright band seen in single frames) drop out.
+- Barnard's Star, detector 2: three frames (18, 18 and 25 exposures); the star visibly steps north between them.
+- WISE 0855, detector 6: the combined frames are much deeper than single exposures, but the object has not been identified in them.
+- The starter cache now holds both views for the five targets: 60 frame sets, 79 MB.
+- At most 72 exposures per request are still used, so in the R Draconis deep field a combined frame uses only part of the available data.

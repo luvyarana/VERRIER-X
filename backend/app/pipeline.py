@@ -38,6 +38,77 @@ def pick_evenly(items: list, limit: int) -> list:
     return [items[i] for i in np.unique(np.linspace(0, len(items) - 1, limit).round().astype(int))]
 
 
+def image_noise(image: np.ndarray) -> float:
+    """Noise of an image from the median absolute deviation of its pixels."""
+    values = image[np.isfinite(image)]
+    return 1.4826 * float(np.median(np.abs(values - np.median(values)))) if values.size else 0.0
+
+
+def _round(value, digits=4):
+    return None if value is None else round(float(value), digits)
+
+
+def single_frame(frame: dict, season: int) -> dict:
+    """Description of one exposure, plus its image."""
+    e = frame["exposure"]
+    return {
+        "id": e["id"],
+        "time": frame["date"] or Time(frame["mjd"], format="mjd").isot,
+        "mjd": frame["mjd"],
+        "season": season,
+        "detector": e["detector"],
+        "wavelength_um": frame["wavelength_um"],
+        "bandwidth_um": frame["bandwidth_um"],
+        "n_exposures": 1,
+        "coverage": round(frame["coverage"], 3),
+        "bad_fraction": round(frame["bad_fraction"], 4),
+        "saturated_pixels": frame["saturated_pixels"],
+        "target_flags": frame["target_flags"],
+        "collection": e["collection"],
+        "source_url": e["irsa_url"],
+        "image": frame["image"],
+    }
+
+
+def stack_season(season: int, group: list[dict]) -> dict:
+    """All exposures of one season combined (median of each pixel).
+
+    The median ignores a value that appears in only a few exposures, so cosmic-ray
+    hits and other one-off artefacts drop out, and the noise falls roughly with the
+    square root of the number of exposures. The exposures are at different
+    wavelengths within the detector's range, so the result is a broad-band image.
+    """
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        image = np.nanmedian(np.array([f["image"] for f in group]), axis=0).astype("f4")
+    waves = [f["wavelength_um"] for f in group if f["wavelength_um"] is not None]
+    mjd = float(np.median([f["mjd"] for f in group]))
+    first = group[0]["exposure"]
+    return {
+        "id": f"season-{season}",
+        "time": Time(mjd, format="mjd").isot,
+        "time_start": group[0]["date"],
+        "time_end": group[-1]["date"],
+        "mjd": mjd,
+        "season": season,
+        "detector": first["detector"],
+        "wavelength_um": _round(np.median(waves)) if waves else None,
+        "wavelength_min_um": _round(min(waves)) if waves else None,
+        "wavelength_max_um": _round(max(waves)) if waves else None,
+        "bandwidth_um": None,
+        "n_exposures": len(group),
+        "coverage": round(float(np.mean(np.isfinite(image))), 3),
+        "bad_fraction": round(float(np.mean([f["bad_fraction"] for f in group])), 4),
+        "saturated_pixels": int(np.median([f["saturated_pixels"] for f in group])),
+        "target_flags": sorted({name for f in group for name in f["target_flags"]}),
+        "collection": first["collection"],
+        "source_url": first["irsa_url"],
+        "image": image,
+    }
+
+
 def _one_frame(exposure, ra, dec, half, grid, size):
     cut = archive.fetch_cutout(exposure, ra, dec, half)
     clean, stats = prepare.prepare(cut["image"], cut["flags"])
@@ -94,35 +165,22 @@ def build_frames(ra: float, dec: float, fov: float, band: int, mode: str = "expo
     progress(stage="render", message="Rendering frames")
     frames.sort(key=lambda f: f["mjd"])
     seasons = assign_seasons([f["mjd"] for f in frames])
-    noise = float(np.median([f["noise"] for f in frames])) if frames else 0.0
-    low, high, soft = render.stretch_limits([f["image"] for f in frames], noise)
+    if mode == "seasons":
+        items = [stack_season(s, [f for f, k in zip(frames, seasons) if k == s]) for s in sorted(set(seasons))]
+        noise = float(np.median([image_noise(i["image"]) for i in items])) if items else 0.0
+    else:
+        items = [single_frame(f, s) for f, s in zip(frames, seasons)]
+        noise = float(np.median([f["noise"] for f in frames])) if frames else 0.0
+    low, high, soft = render.stretch_limits([i["image"] for i in items], noise)
     out_dir.mkdir(parents=True, exist_ok=True)
     listing = []
-    for i, (frame, season) in enumerate(zip(frames, seasons)):
-        (out_dir / f"{i:03d}.png").write_bytes(render.to_png(frame["image"], low, high, soft))
-        e = frame["exposure"]
-        listing.append({
-            "index": i,
-            "id": e["id"],
-            "time": frame["date"] or Time(frame["mjd"], format="mjd").isot,
-            "mjd": frame["mjd"],
-            "season": season,
-            "detector": e["detector"],
-            "wavelength_um": frame["wavelength_um"],
-            "bandwidth_um": frame["bandwidth_um"],
-            "n_exposures": 1,
-            "coverage": round(frame["coverage"], 3),
-            "bad_fraction": round(frame["bad_fraction"], 4),
-            "saturated_pixels": frame["saturated_pixels"],
-            "target_flags": frame["target_flags"],
-            "collection": e["collection"],
-            "png_url": f"/api/frame/{key}/{i:03d}.png",
-            "source_url": e["irsa_url"],
-        })
+    for i, item in enumerate(items):
+        (out_dir / f"{i:03d}.png").write_bytes(render.to_png(item.pop("image"), low, high, soft))
+        listing.append({"index": i, **item, "png_url": f"/api/frame/{key}/{i:03d}.png"})
     season_list = [
-        {"index": s, "start": group[0]["time"][:10], "end": group[-1]["time"][:10], "frames": len(group)}
+        {"index": s, "start": group[0]["date"][:10], "end": group[-1]["date"][:10], "frames": len(group)}
         for s in sorted(set(seasons))
-        for group in [[f for f in listing if f["season"] == s]]
+        for group in [[f for f, k in zip(frames, seasons) if k == s]]
     ]
     result = {
         "status": "done",
