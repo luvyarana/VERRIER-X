@@ -8,7 +8,7 @@ VERRIER-X
 
 ## High-level project summary
 
-VERRIER-X is a public website that turns NASA's SPHEREx sky survey into short movies. You type a sky position or an object name, and it finds every SPHEREx image of that spot, lines them up, and plays them in time order. Stars that are far away stay still; anything nearby that moves, such as a close star, a brown dwarf or an unknown planet in the outer solar system, jumps between visits and catches the eye. SPHEREx re-observes the whole sky about every six months, so it is a new way to look for moving objects in the infrared, but its images are hard to use directly: each one is a large file, rotated differently, taken at a different wavelength. VERRIER-X hides that work so that anyone with a web browser can search for motion.
+VERRIER-X is a public website that turns NASA's SPHEREx sky survey into short movies. You type a sky position or an object name, and it finds every SPHEREx image of that spot, lines them up, and shows how the sky there changes between visits. Stars that are far away stay still; anything nearby that moves, such as a close star, a brown dwarf or an unknown planet in the outer solar system, jumps between visits and catches the eye. Known stars from ESA's Gaia catalogue are marked, so a moving object with no marker stands out as something new. SPHEREx re-observes the whole sky about every six months, so it is a new way to look for moving objects in the infrared, but its images are hard to use directly: each one is a large file, rotated differently, taken at a different wavelength. VERRIER-X hides that work so that anyone with a web browser can search for motion.
 
 ## Link to project demo
 
@@ -49,8 +49,8 @@ The code, tests and documentation were written with Claude Code (Anthropic's AI 
 
 ## Space agency partner data and other references
 
-- European Space Agency: Gaia Data Release 3 (star positions and proper motions), https://www.cosmos.esa.int/gaia , read through the GAVO TAP service, https://dc.g-vo.org/tap
-- SIMBAD database and Sesame name resolver, CDS Strasbourg: https://simbad.cds.unistra.fr/simbad/
+- European Space Agency: Gaia Data Release 3 (star positions and proper motions), https://www.cosmos.esa.int/web/gaia/dr3 , read through the GAVO TAP service, https://dc.g-vo.org/tap
+- SIMBAD database and Sesame name resolver, CDS Strasbourg: https://cds.unistra.fr/
 - Software: Astropy, reproject, NumPy, SciPy, Pillow, FastAPI, Uvicorn, Next.js, React, Tailwind CSS.
 - Challenge page: https://www.spaceappschallenge.org/2026/challenges/planet-x-and-spherex/
 - Catalogue sources for the test targets (2MASS, AllWISE, Hipparcos, AAVSO VSX and the papers cited) are listed in `docs/targets.md` §9.
