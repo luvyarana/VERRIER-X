@@ -117,3 +117,9 @@ Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment chec
 - WISE 0855, detector 6: the combined frames are much deeper than single exposures, but the object has not been identified in them.
 - The starter cache now holds both views for the five targets: 60 frame sets, 79 MB.
 - At most 72 exposures per request are still used, so in the R Draconis deep field a combined frame uses only part of the available data.
+
+## 9. Corrected target positions and WISE 0855 (2026-11-15)
+
+- The quick-pick positions were recomputed for epoch 2026.0 (see `docs/targets.md` §0). The old ones were off by 8.4″ (Barnard's Star), 12.5″ (Epsilon Indi B) and 31.5″ (WISE 0855).
+- IRSA's search returned 502 errors while the starter cache was rebuilt, so the exposure lists found at the old positions were reused for the new ones. The positions differ by at most 32″ and each exposure covers 3.5°, so the lists should be the same apart from exposures whose edge falls between the two positions.
+- At the corrected position, WISE 0855 shows up in combined visits in detectors 5 and 6 at 10–17σ, moving about 8″ west in a year, blended with a fixed background star 4.6″ away. `docs/evidence/wise0855_detectors.png` shows panels 2.8 arcminutes wide (rows: detector 6, 5, 3; columns: visits in time order). The star is the bright central object in the detector-3 row.

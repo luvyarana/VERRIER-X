@@ -14,9 +14,9 @@ import requests
 
 # Same positions and detectors as the quick-pick buttons in frontend/app/page.tsx.
 TARGETS = [
-    ("Barnard's Star", 269.4486, 4.7685, 2),
-    ("Epsilon Indi B", 331.09, -56.801, 3),
-    ("WISE 0855", 133.7685, -7.2429, 6),
+    ("Barnard's Star", 269.44627, 4.76819, 2),
+    ("Epsilon Indi B", 331.09636, -56.80058, 3),
+    ("WISE 0855", 133.75969, -7.24223, 6),
     ("RW Aurigae", 76.9563, 30.4014, 2),
     ("R Draconis", 248.1675, 66.755, 2),
 ]

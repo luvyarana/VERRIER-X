@@ -7,6 +7,32 @@
 
 ---
 
+## 0. Independent recheck and corrections (15 November 2026)
+
+Every 2026.0 position in this sheet was recomputed independently with Astropy (`SkyCoord.apply_space_motion`) from the reference positions and proper motions given below, and compared with where each object actually appears in the SPHEREx frames.
+
+| Target | Finding | Action |
+|---|---|---|
+| Barnard's Star | The 2026.0 right ascension was typed as 269.443900°; the correct value is 269.446267° (8.5″ further east). Declination was correct. The star's measured position in the frames agrees with the corrected value. | Corrected below. |
+| Epsilon Indi B | The 2026.0 right ascension was typed as 331.090354°; the correct value is 331.096330° (11.8″ further east). Declination was correct. The object was measured 11–16″ east of the old marker, which confirms the corrected value. | Corrected below. |
+| WISE 0855 | The 2026.0 position here (133.7597°, −7.2422°) is right. The app's old quick-pick was 31.5″ too far east because it assumed the wrong epoch for the catalogue position. | Quick-pick corrected. At the corrected position a source is detected; see §6.3. |
+| RW Aurigae | Correct. | None. |
+| R Draconis | The 2026.0 right ascension was typed as 248.161801°; the correct value is 248.167119°. The star moves 0.02″ per year, so it cannot have shifted 8″. The old quick-pick was within 0.5″. | Corrected below. |
+
+Cause: `scripts/calculate_target_predictions.py` moved every target forward by a fixed 26 years, whatever epoch its tabulated position was for, and three right ascensions in this sheet did not match the script's own output. The script now uses each position's own epoch, and `docs/target_predictions.json` has been regenerated. The W2 flux of WISE 0855 was also wrong by a factor of ten (see §6.3).
+
+The quick-pick buttons and the starter cache now use the corrected 2026.0 positions:
+
+| Target | RA (deg) | Dec (deg) |
+|---|---|---|
+| Barnard's Star | 269.44627 | +4.76819 |
+| Epsilon Indi B | 331.09636 | −56.80058 |
+| WISE 0855 | 133.75969 | −7.24223 |
+| RW Aurigae | 76.9563 | +30.4014 |
+| R Draconis | 248.1675 | +66.7550 |
+
+---
+
 ## 1. Purpose
 
 The NASA Space Apps Challenge specification instructs teams to test their interactive SPHEREx viewer on five designated astronomical targets:
@@ -85,7 +111,7 @@ $$\Delta \theta_{\text{apparent}} = \sqrt{(\Delta \text{East}_{\text{apparent}})
 |---|---|---|---|---|---|---|---|
 | **Barnard's Star** | `17h 57m 48.498s` (269.452075°) | `+04° 41′ 36.11″` (+4.693364°) | $10.3934 \pm 0.0004$ | $546.98 \pm 0.40$ | $1.83$ | $J=5.24, H=4.83, K=4.52$ | Saturated core; moves northward by $\sim 1.67$ native px/yr ($5.0$ disp px) with measurable E–W parallax swing. |
 | **Epsilon Indi B** | `22h 04m 10.520s` (331.043833°) | `-56° 46′ 58.00″` (-56.782778°) | $4.6842 \pm 0.0042$ | $270.66 \pm 0.69$ | $3.70$ | $J=11.91, H=11.31, K=11.21$ | Tight binary (Ba+Bb) unresolved by SPHEREx; moves southeast by $\sim 0.76$ native px/yr ($2.3$ disp px). |
-| **WISE 0855** | `08h 55m 10.832s` (133.795131°) | `-07° 14′ 42.53″` (-7.245146°) | $8.1515 \pm 0.0013$ | $439.00 \pm 2.40$ | $2.28$ | $J\approx 25.0, W1=17.8, W2=14.0$ | Coldest known brown dwarf ($T\approx 250\text{ K}$). **Not detected**; below single-exposure narrow-band sensitivity limit. |
+| **WISE 0855** | `08h 55m 10.832s` (133.795131°) | `-07° 14′ 42.53″` (-7.245146°) | $8.1515 \pm 0.0013$ | $439.00 \pm 2.40$ | $2.28$ | $J\approx 25.0, W1=17.8, W2=14.0$ | Coldest known brown dwarf ($T\approx 250\text{ K}$). Invisible in single exposures; **probably detected** in combined visits at 3.8–5.0 µm, blended with a background star (§6.3). |
 | **RW Aurigae** | `05h 07m 49.570s` (76.956542°) | `+30° 24′ 05.20″` (+30.401444°) | $0.0216 \pm 0.0028$ | $6.406 \pm 0.044$ | $156.1$ | $V=8.5-15.0, J=8.38, K=7.02$ | Classical T Tauri star with irregular dimmings; stationary ($< 0.005$ px/yr); saturated core in Band 2. |
 | **R Draconis** | `16h 32m 40.230s` (248.167625°) | `+66° 45′ 17.90″` (+66.754972°) | $0.0219 \pm 0.0007$ | $1.30 \pm 0.66$ | $\sim 770$ | $V=6.7-13.2, K\approx 3.85$ | Mira pulsating giant ($P=245.6\text{ d}$); stationary ($< 0.005$ px/yr); heavily saturated core wanders 3–6″ artificially. |
 
@@ -102,9 +128,9 @@ $$\Delta \theta_{\text{apparent}} = \sqrt{(\Delta \text{East}_{\text{apparent}})
 - **Gaia DR3 Coordinates (Epoch J2016.0):**
   - $\alpha = 269.448503^\circ, \quad \delta = +4.739410^\circ$
 - **Propagated Coordinates (Epoch 2026.0):**
-  - Sexagesimal: `17h 57m 46.536s` / `+04° 46′ 05.50″`
-  - Decimal: $\alpha = 269.443900^\circ, \quad \delta = +4.768194^\circ$
-- **Quick-Pick App Coordinates:** $\alpha = 269.4486^\circ, \delta = +4.7685^\circ$ (offset by $16.9$″ East from true epoch 2026.0 position).
+  - Sexagesimal: `17h 57m 47.104s` / `+04° 46′ 05.50″`
+  - Decimal: $\alpha = 269.446267^\circ, \quad \delta = +4.768194^\circ$
+- **Quick-Pick App Coordinates:** now $\alpha = 269.44627^\circ, \delta = +4.76819^\circ$ (the 2026.0 position). The earlier quick-pick ($269.4486^\circ, +4.7685^\circ$) was $8.4$″ east of it.
 - **Proper Motion:**
   - $\mu_{\alpha*} = -801.55 \pm 0.38\text{ mas/yr}$ (westward)
   - $\mu_{\delta} = +10362.39 \pm 0.35\text{ mas/yr}$ (northward)
@@ -152,9 +178,9 @@ Bright red dwarf, immediately visible in all frames. Steps visibly northward by 
   - Sexagesimal: `22h 04m 10.520s` / `-56° 46′ 58.00″`
   - Decimal: $\alpha = 331.043833^\circ, \quad \delta = -56.782778^\circ$
 - **Propagated Coordinates (Epoch 2026.0):**
-  - Sexagesimal: `22h 04m 21.685s` / `-56° 48′ 02.14″`
-  - Decimal: $\alpha = 331.090354^\circ, \quad \delta = -56.800594^\circ$
-- **Quick-Pick App Coordinates:** $\alpha = 331.0900^\circ, \delta = -56.8010^\circ$ (within $1.5$″ of actual 2026.0 position).
+  - Sexagesimal: `22h 04m 23.119s` / `-56° 48′ 02.14″`
+  - Decimal: $\alpha = 331.096330^\circ, \quad \delta = -56.800594^\circ$
+- **Quick-Pick App Coordinates:** now $\alpha = 331.09636^\circ, \delta = -56.80058^\circ$ (the 2026.0 position). The earlier quick-pick ($331.0900^\circ, -56.8010^\circ$) was $12.5$″ west of it.
 - **Proper Motion:**
   - $\mu_{\alpha*} = +3981.98 \pm 4.20\text{ mas/yr}$ (eastward)
   - $\mu_{\delta} = -2466.83 \pm 4.10\text{ mas/yr}$ (southward)
@@ -207,9 +233,9 @@ Clean, isolated point source of magnitude $\sim 11.2$ in detector 3, completely 
   - Sexagesimal: `08h 55m 10.832s` / `-07° 14′ 42.53″`
   - Decimal: $\alpha = 133.795131^\circ, \quad \delta = -7.245146^\circ$
 - **Propagated Coordinates (Epoch 2026.0):**
-  - Sexagesimal: `08h 55m 02.261s` / `-07° 14′ 32.04″`
-  - Decimal: $\alpha = 133.759421^\circ, \quad \delta = -7.242233^\circ$
-- **Quick-Pick App Coordinates:** $\alpha = 133.7685^\circ, \delta = -7.2429^\circ$ (offset by $\sim 33$″ East because an unpropagated intermediate epoch was entered).
+  - Sexagesimal: `08h 55m 02.326s` / `-07° 14′ 32.04″`
+  - Decimal: $\alpha = 133.759690^\circ, \quad \delta = -7.242233^\circ$
+- **Quick-Pick App Coordinates:** now $\alpha = 133.75969^\circ, \delta = -7.24223^\circ$ (the 2026.0 position). The earlier quick-pick ($133.7685^\circ, -7.2429^\circ$) was $31.5$″ east of it, because the catalogue position was assumed to be for 2014 rather than 2010.42.
 - **Proper Motion:**
   - $\mu_{\alpha*} = -8123.7 \pm 1.3\text{ mas/yr}$ (westward)
   - $\mu_{\delta} = +673.2 \pm 1.3\text{ mas/yr}$ (northward)
@@ -227,10 +253,25 @@ Clean, isolated point source of magnitude $\sim 11.2$ in detector 3, completely 
 | **$W1$ (3.4 µm)** | 17.82 | $\pm 0.20$ | AllWISE / Spitzer | Severe molecular absorption; contaminated in raw WISE |
 | **$W2$ (4.6 µm)** | 13.97 | $\pm 0.05$ | AllWISE / NEOWISE | Detected in broad $4.5–5.0$ µm thermal window |
 
-### 6.3 Scientific Reason for Non-Detection in SPHEREx
-1. **Narrow-Band Spectral Slicing:** SPHEREx uses Linear Variable Filters with $R \sim 40$. Each single exposure samples only $\Delta \lambda \sim 0.08\text{ µm}$. A source with broad-band $W2 \sim 14.0\text{ mag}$ produces a spectral flux density of only $\sim 0.04\text{ mJy}$, which is far below the single-exposure $5\sigma$ point-source sensitivity ($\sim 0.3\text{ mJy} \approx 12.5\text{ mag}$).
-2. **Median Stack Insufficiency:** Stacking 21 exposures in Season 1 or Season 2 improves SNR by $\sqrt{21} \approx 4.6$, reaching $\sim 13.8$ mag, which is still marginal ($< 2\sigma$ above background photon noise).
-3. **Coordinate Centering Offset:** The quick-pick button uses $\alpha = 133.7685^\circ$, which is displaced by $\sim 33$″ from the object's actual 2026.0 coordinate ($\alpha = 133.7594^\circ$).
+### 6.3 Detection in SPHEREx at the corrected position (rechecked 15 November 2026)
+
+The first test of this target found nothing, because the app's marker was 31.5″ east of the object. At the corrected 2026.0 position, with each visit's exposures combined (median), a source is present in the two longest-wavelength detectors:
+
+| Detector | Visit | Exposures | Peak within 16″ | Position of peak (east, north of 2026.0 position) |
+|---|---|---|---|---|
+| 6 (4.42–5.00 µm) | May 2025 | 3 | 4σ | not significant |
+| 6 | Nov–Dec 2025 | 21 | 12σ | 0.0″, 0.0″ |
+| 6 | Apr–May 2026 | 21 | 17σ | −2.0″, 0.0″ |
+| 5 (3.82–4.42 µm) | May 2025 | 8 | 10σ | +6.1″, 0.0″ |
+| 5 | Nov 2025 | 19 | 10σ | +2.0″, 0.0″ |
+| 5 | Dec 2025 | 6 | 10σ | +2.0″, 0.0″ |
+| 5 | May 2026 | 15 | 15σ | −2.0″, 0.0″ |
+
+In detector 5 the peak moves about 8″ west in one year. WISE 0855 is predicted to move 7.9″ west in that time.
+
+**Caution: this is a probable detection, not a clean one.** A background star sits 4.6″ from the 2026.0 position (4.1″ west, 2.0″ north). It is bright and does not move in detector 3 (1.62–2.42 µm), where WISE 0855 is invisible. In detectors 5 and 6 the two are blended: the source looks elongated to the east in 2025 and round by May 2026, as expected if a moving object is closing on a fixed star. The westward shift of the peak and the excess brightness at 4.4–5.0 µm point to WISE 0855, but the two have not been separated, and no photometry has been done.
+
+Corrections to the earlier text of this section: a W2 magnitude of 13.97 corresponds to about 0.44 mJy, not 0.04 mJy; and the sensitivity limits quoted earlier (12.5 and 13.8 mag) were not taken from a SPHEREx reference and have been removed.
 
 ### 6.4 Seasonal Movement Predictions (Detector 6: 4.42–5.00 µm)
 Observed epochs extracted from `backend/seed/frames/74bd1e1499d2b8d3/result.json`:
@@ -245,7 +286,7 @@ Observed epochs extracted from `backend/seed/frames/74bd1e1499d2b8d3/result.json
 | **Total Baseline (S0 → S2)** | **2025-05-05 → 2026-04-26** | **0.973** | **7.931″** | **1.292 / 3.875** | **7.940″** | **1.293 / 3.880** | **275.0° (W)** |
 
 **What a viewer should expect:**
-No visible source at the marker. The object is the coldest known brown dwarf ($W2 \approx 14.0\text{ mag}$) and is too faint to appear in individual narrow-band SPHEREx exposures or shallow 21-frame stacks; a non-moving faint background star $\sim 30$″ away must not be mistaken for the target.
+Nothing in single exposures. In the "Visits combined" view with the 4.42–5.00 µm or 3.82–4.42 µm detector, a faint source appears at the marker and shifts west between visits. It is blended with a fixed background star 4.6″ away, so treat it as a probable detection (§6.3).
 
 ---
 
@@ -310,9 +351,9 @@ Bright young star pinned firmly to the center marker; shows zero detectable moti
   - Sexagesimal: `16h 32m 40.230s` / `+66° 45′ 17.90″`
   - Decimal: $\alpha = 248.167625^\circ, \quad \delta = +66.754972^\circ$
 - **Propagated Coordinates (Epoch 2026.0):**
-  - Sexagesimal: `16h 32m 38.832s` / `+66° 45′ 18.15″`
-  - Decimal: $\alpha = 248.161801^\circ, \quad \delta = +66.755041^\circ$
-- **Quick-Pick App Coordinates:** $\alpha = 248.1675^\circ, \delta = +66.7550^\circ$ (matches J2000 position within $0.4$″; offset by $8.4$″ East from 2026.0 position).
+  - Sexagesimal: `16h 32m 40.109s` / `+66° 45′ 18.14″`
+  - Decimal: $\alpha = 248.167119^\circ, \quad \delta = +66.755040^\circ$
+- **Quick-Pick App Coordinates:** $\alpha = 248.1675^\circ, \delta = +66.7550^\circ$ (within $0.5$″ of the 2026.0 position; unchanged).
 - **Proper Motion:**
   - $\mu_{\alpha*} = -20.68 \pm 0.73\text{ mas/yr}$
   - $\mu_{\delta} = +7.07 \pm 0.67\text{ mas/yr}$

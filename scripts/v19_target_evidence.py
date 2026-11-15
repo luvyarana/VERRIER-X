@@ -11,7 +11,7 @@ from PIL import Image
 from app import align, archive, config, pipeline
 warnings.simplefilter("ignore")
 OUT = sys.argv[1]
-T = [("barnard", 269.4486, 4.7685, 2), ("epsindi", 331.09, -56.801, 3), ("wise0855", 133.7685, -7.2429, 6),
+T = [("barnard", 269.44627, 4.76819, 2), ("epsindi", 331.09636, -56.80058, 3), ("wise0855", 133.75969, -7.24223, 6),
      ("rwaur", 76.9563, 30.4014, 2), ("rdra", 248.1675, 66.755, 2)]
 def centroid(img, x, y, r):
     box = img[y-r:y+r+1, x-r:x+r+1].astype(float)

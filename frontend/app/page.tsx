@@ -5,11 +5,11 @@ import Viewer from "@/components/Viewer";
 import { DETECTORS, getFrames, type Mode, type Query, type Result, type Working } from "@/lib/api";
 import { formatDec, formatRa, parseDec, parseRa } from "@/lib/coords";
 
-// Approximate 2026 positions of the challenge's test targets.
+// Positions of the challenge's test targets at epoch 2026.0 (catalogue position moved by proper motion; see docs/targets.md).
 const TARGETS: { name: string; ra: number; dec: number; band: number }[] = [
-  { name: "Barnard's Star", ra: 269.4486, dec: 4.7685, band: 2 },
-  { name: "Epsilon Indi B", ra: 331.09, dec: -56.801, band: 3 },
-  { name: "WISE 0855", ra: 133.7685, dec: -7.2429, band: 6 },
+  { name: "Barnard's Star", ra: 269.44627, dec: 4.76819, band: 2 },
+  { name: "Epsilon Indi B", ra: 331.09636, dec: -56.80058, band: 3 },
+  { name: "WISE 0855", ra: 133.75969, dec: -7.24223, band: 6 },
   { name: "RW Aurigae", ra: 76.9563, dec: 30.4014, band: 2 },
   { name: "R Draconis", ra: 248.1675, dec: 66.755, band: 2 },
 ];

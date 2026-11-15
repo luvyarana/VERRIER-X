@@ -7,14 +7,14 @@ Enter a sky position (Right Ascension and Declination) and VERRIER-X plays the S
 
 **Live site:** https://frontend-ivory-one-19.vercel.app
 
-Try it on a fast-moving star: [Barnard's Star](https://frontend-ivory-one-19.vercel.app/?ra=269.4486&dec=4.7685&fov=10&band=2).
+Try it on a fast-moving star: [Barnard's Star](https://frontend-ivory-one-19.vercel.app/?ra=269.44627&dec=4.76819&fov=10&band=2).
 
 ## What it does
 
 - Takes RA and Dec in degrees or in hours/degrees, minutes and seconds, and a field of view from 5 to 60 arcminutes.
 - Finds every public SPHEREx exposure of that position (Data Release 1 and Quick Release 3, April 2025 to October 2026).
 - Lines the images up north-up on one grid, so stars stay on the same pixel from frame to frame.
-- Plays them as a movie, coloured by observing season. Anything that jumps between seasons has moved.
+- Combines each visit's exposures into one deeper frame and blinks between visits ("Visits combined"), or plays every exposure as a movie coloured by observing season. Anything that jumps between visits has moved.
 - Lets you pick one of the six SPHEREx detectors (0.75 to 5.0 microns) and labels every frame with its date and wavelength.
 - Shows the quality flags at the centre of each frame and links to the original file.
 - Keeps the position in the link, so a view can be shared.
@@ -35,7 +35,7 @@ A new data release is added by editing one list in `backend/app/config.py`. The 
 
 ## Does it work?
 
-See [docs/demo-script.md](docs/demo-script.md) for the five test targets. In short: Barnard's Star and Epsilon Indi B visibly move by the expected amounts; RW Aurigae and R Draconis stay put; WISE 0855 is too faint to see.
+See [docs/demo-script.md](docs/demo-script.md) for the five test targets. In short: Barnard's Star and Epsilon Indi B visibly move by the expected amounts; RW Aurigae and R Draconis stay put; WISE 0855 is invisible in single exposures but is probably detected, blended with a background star, once each visit's exposures are combined. The catalogue values and predictions are in [docs/targets.md](docs/targets.md).
 
 More detail: [docs/data-notes.md](docs/data-notes.md) (data and measurements) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) (plan).
 

@@ -8,6 +8,31 @@
 
 ---
 
+## 0. Recheck and updates (15 November 2026, afternoon)
+
+This record was rechecked after it was written. Three things changed, and they supersede the text below wherever the two disagree.
+
+1. **Target positions corrected.** Three of the 2026.0 right ascensions in `docs/targets.md` were wrong (Barnard's Star, Epsilon Indi B, R Draconis), and the app's WISE 0855 marker was 31.5″ too far east. The quick-pick buttons and the starter cache now use the corrected positions; details are in `docs/targets.md` §0. All links in this record point to the corrected positions.
+2. **"Visits combined" view added.** The site now opens in a view that combines each visit's exposures into one deeper frame. The measurements below were made on the same kind of per-visit median image.
+3. **WISE 0855 is probably detected.** At the corrected position, combined visits in the 3.82–4.42 µm and 4.42–5.00 µm detectors show a source at the marker at 10–17σ whose peak moves about 8″ west in a year (predicted: 7.9″). It is blended with a fixed background star 4.6″ away, so this is a probable detection, not a clean one. Section 4 below describes the earlier test at the wrong position and is kept only as a record. See `docs/targets.md` §6.3.
+
+Offsets re-measured at the corrected positions (east, north of the marker, from per-visit median images):
+
+| Target | Visit | Offset east | Offset north |
+|---|---|---|---|
+| Barnard's Star | Aug 2025 | +1.5″ | −2.6″ |
+| | Mar 2026 | +3.6″ | +2.2″ |
+| | Aug–Sep 2026 | +0.4″ | +7.5″ |
+| Epsilon Indi B | Apr–May 2025 | −1.5″ | +1.2″ |
+| | Jun 2025 | −1.1″ | +1.1″ |
+| | Sep–Nov 2025 | −0.7″ | −0.5″ |
+| | Apr–May 2026 | +2.3″ | −1.5″ |
+| | Sep 2026 | +3.3″ | −2.9″ |
+
+Both objects now straddle the marker, as they should for a 2026.0 position: Barnard's Star moves 10.1″ north in a year (catalogue 10.4″ per year), and Epsilon Indi B moves 4.8″ east and 4.1″ south in 1.4 years (catalogue 4.68″ per year toward the east-south-east). The "± " uncertainties quoted in the tables below are estimates, not derived from repeated measurements.
+
+---
+
 ## 1. Executive Summary & Verification Overview
 
 This document presents the rigorous scientific validation record for the **VERRIER-X** interactive SPHEREx viewer across the five test targets designated in the NASA Space Apps Challenge prompt.
@@ -20,9 +45,9 @@ Measurements were obtained from per-season median stacked cutouts resampled onto
 
 | Target | Quick-Pick URL | Detector & Band | SPHEREx Pixels | Theoretical Shift (PM / Apparent) | Measured Shift | Measured PA | Status & Finding |
 |---|---|---|---|---|---|---|---|
-| **Barnard's Star** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=269.4486&dec=4.7685&fov=10&band=2) | D2 (1.10–1.62 µm) | 6.14″ / px (disp: 2.05″) | $10.23$″ / $10.25$″ ($1.67$ native px) | **$10.02 \pm 0.50$″** ($1.63$ native px) | $355.6^\circ$ (N) | **Validated.** Clearly visible; moves northward by 1.63 native pixels in 0.98 yr; parallax swing confirmed. |
-| **Epsilon Indi B** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=331.09&dec=-56.801&fov=10&band=3) | D3 (1.62–2.42 µm) | 6.14″ / px (disp: 2.05″) | $6.60$″ / $6.77$″ ($1.10$ native px) | **$5.66 - 6.24 \pm 0.35$″** ($0.92 - 1.02$ native px) | $\approx 135^\circ - 140^\circ$ (SE) | **Validated.** Binary brown dwarf (unresolved) moves steadily southeast by ~1.0 native pixel across 5 seasons. |
-| **WISE 0855** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=133.7685&dec=-7.2429&fov=10&band=6) | D6 (4.42–5.00 µm) | 6.14″ / px (disp: 2.05″) | $7.93$″ / $7.94$″ ($1.29$ native px) | **Not detected** (SNR $< 2.5$) | N/A | **Validated.** Ultracool Y-dwarf ($W2\sim 14$); rigorously confirmed below SPHEREx single-exposure narrow-band detection threshold. |
+| **Barnard's Star** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=269.44627&dec=4.76819&fov=10&band=2) | D2 (1.10–1.62 µm) | 6.14″ / px (disp: 2.05″) | $10.23$″ / $10.25$″ ($1.67$ native px) | **$10.02 \pm 0.50$″** ($1.63$ native px) | $355.6^\circ$ (N) | **Validated.** Clearly visible; moves northward by 1.63 native pixels in 0.98 yr; parallax swing confirmed. |
+| **Epsilon Indi B** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=331.09636&dec=-56.80058&fov=10&band=3) | D3 (1.62–2.42 µm) | 6.14″ / px (disp: 2.05″) | $6.60$″ / $6.77$″ ($1.10$ native px) | **$5.66 - 6.24 \pm 0.35$″** ($0.92 - 1.02$ native px) | $\approx 135^\circ - 140^\circ$ (SE) | **Validated.** Binary brown dwarf (unresolved) moves steadily southeast by ~1.0 native pixel across 5 seasons. |
+| **WISE 0855** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=133.75969&dec=-7.24223&fov=10&band=6) | D6 (4.42–5.00 µm) | 6.14″ / px (disp: 2.05″) | $7.93$″ / $7.94$″ ($1.29$ native px) | **Probable detection** in combined visits (10–17σ, blended) | West | **Updated.** Not visible in single exposures. At the corrected position a source appears in combined visits and shifts about 8″ west in a year; it is blended with a background star (see §0). |
 | **RW Aurigae** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=76.9563&dec=30.4014&fov=10&band=2) | D2 (1.10–1.62 µm) | 6.14″ / px (disp: 2.05″) | $0.02$″ ($< 0.004$ native px) | **$0.44 \pm 0.40$″** ($< 0.07$ native px) | Random | **Validated.** Astrometrically stationary; demonstrates registration stability; saturated core shows uncalibrated intensity changes. |
 | **R Draconis** | [Open in Viewer](https://frontend-ivory-one-19.vercel.app/?ra=248.1675&dec=66.755&fov=10&band=2) | D2 (1.10–1.62 µm) | 6.14″ / px (disp: 2.05″) | $0.02$″ ($< 0.004$ native px) | **Wanders $3–6$″** (Centroid artifact) | Variable | **Validated.** Mira variable; stationary; heavy core saturation (18–26 repaired px) causes artificial photocenter wandering. |
 
@@ -31,7 +56,7 @@ Measurements were obtained from per-season median stacked cutouts resampled onto
 ## 2. Target 1 — Barnard's Star
 
 ### 2.1 Observation Geometry & Evidence
-- **Application Link:** [/?ra=269.4486&dec=4.7685&fov=10&band=2](https://frontend-ivory-one-19.vercel.app/?ra=269.4486&dec=4.7685&fov=10&band=2)
+- **Application Link:** [/?ra=269.44627&dec=4.76819&fov=10&band=2](https://frontend-ivory-one-19.vercel.app/?ra=269.44627&dec=4.76819&fov=10&band=2)
 - **Dataset:** SPHEREx Detector 2 (1.10–1.62 µm), 61 frames, 3 observing seasons.
 - **Seeded Hash Key:** `01bea760d7549fb0`
 - **Season Image Strip:** [docs/evidence/barnard_seasons.png](evidence/barnard_seasons.png) (3 panels of 363×363 pixels, 4 arcminutes wide each, north up, east left).
@@ -56,7 +81,7 @@ Measurements were obtained from per-season median stacked cutouts resampled onto
 ## 3. Target 2 — Epsilon Indi B
 
 ### 3.1 Observation Geometry & Evidence
-- **Application Link:** [/?ra=331.09&dec=-56.801&fov=10&band=3](https://frontend-ivory-one-19.vercel.app/?ra=331.09&dec=-56.801&fov=10&band=3)
+- **Application Link:** [/?ra=331.09636&dec=-56.80058&fov=10&band=3](https://frontend-ivory-one-19.vercel.app/?ra=331.09636&dec=-56.80058&fov=10&band=3)
 - **Dataset:** SPHEREx Detector 3 (1.62–2.42 µm), 72 selected frames (out of 99 available), 5 observing seasons.
 - **Seeded Hash Key:** `4b2e67c61057a950`
 - **Season Image Strip:** [docs/evidence/epsindi_seasons.png](evidence/epsindi_seasons.png) (5 panels of 363×363 pixels, 4 arcminutes wide each, north up, east left).
@@ -82,8 +107,10 @@ Measurements were obtained from per-season median stacked cutouts resampled onto
 
 ## 4. Target 3 — WISE 0855 (WISE J085510.83−071442.5)
 
+> **Superseded.** This section describes the first test, made 31.5″ east of the object's true position. It found nothing because it was looking in the wrong place. The current result is in §0 above and in `docs/targets.md` §6.3. The sensitivity limits quoted here (12.5 and 13.8 mag) were not taken from a SPHEREx reference.
+
 ### 4.1 Observation Geometry & Evidence
-- **Application Link:** [/?ra=133.7685&dec=-7.2429&fov=10&band=6](https://frontend-ivory-one-19.vercel.app/?ra=133.7685&dec=-7.2429&fov=10&band=6)
+- **Application Link:** [/?ra=133.75969&dec=-7.24223&fov=10&band=6](https://frontend-ivory-one-19.vercel.app/?ra=133.75969&dec=-7.24223&fov=10&band=6)
 - **Dataset:** SPHEREx Detector 6 (4.42–5.00 µm), 45 frames, 3 observing seasons.
 - **Seeded Hash Key:** `74bd1e1499d2b8d3`
 - **Season Image Strip:** [docs/evidence/wise0855_seasons.png](evidence/wise0855_seasons.png) (3 panels of 363×363 pixels, 4 arcminutes wide each, north up, east left).
@@ -171,6 +198,8 @@ During the rigorous scientific audit and verification process, four specific def
 ---
 
 ### Defect Report 1: Quick-Pick Coordinate Stale Epoch Offsets
+
+> **Fixed on 15 November 2026.** Note that three of the right ascensions quoted in this report were themselves wrong; the corrected values are in `docs/targets.md` §0. The real offsets of the old quick-picks were: WISE 0855 31.5″ east, Epsilon Indi B 12.5″ west, Barnard's Star 8.4″ east, RW Aurigae and R Draconis under 1″.
 - **Component:** `frontend/app/page.tsx` (lines 9–15) and `scripts/build_seed.py` (lines 15–21)
 - **Severity:** Medium (Usability & Astrometric Alignment)
 - **Description:**  
@@ -212,6 +241,8 @@ During the rigorous scientific audit and verification process, four specific def
 ---
 
 ### Defect Report 4: Absence of Shift-and-Stack Integration for Faint Motion Candidates
+
+> **Partly addressed on 15 November 2026.** Per-visit median stacking ("Visits combined") is now built, and it was enough to show a probable WISE 0855 detection. Shifting frames along a trial motion before stacking is still not built.
 - **Component:** `backend/app/pipeline.py` (Feature Request / Scientific Enhancement)
 - **Severity:** Low (Functional Enhancement)
 - **Description:**  
@@ -224,6 +255,8 @@ During the rigorous scientific audit and verification process, four specific def
 ## 8. Draft GitHub Issues (Ready for Local Review)
 
 ### Issue Draft 1
+
+> Resolved; the coordinates quoted in this draft are superseded by `docs/targets.md` §0.
 ```markdown
 Title: [BUG] Update quick-pick coordinates to epoch 2026.0 to eliminate pointing offsets
 

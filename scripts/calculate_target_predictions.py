@@ -30,6 +30,7 @@ TARGET_CATALOGUE = {
         "dec_j2000_deg": 4.693364,
         "ra_j2000_str": "17h 57m 48.498s",
         "dec_j2000_str": "+04° 41′ 36.11″",
+        "position_epoch": 2000.0,
         "ra_gaia_dr3_deg": 269.448503,
         "dec_gaia_dr3_deg": 4.739410,
         "ref_epoch": 2016.0,
@@ -180,9 +181,9 @@ def get_season_metadata():
     """Extract representative season dates and median MJDs from backend/seed/frames."""
     seed_frames = Path("backend/seed/frames")
     targets_info = [
-        ("Barnard's Star", 269.4486, 4.7685, 2),
-        ("Epsilon Indi B", 331.09, -56.801, 3),
-        ("WISE 0855", 133.7685, -7.2429, 6),
+        ("Barnard's Star", 269.44627, 4.76819, 2),
+        ("Epsilon Indi B", 331.09636, -56.80058, 3),
+        ("WISE 0855", 133.75969, -7.24223, 6),
         ("RW Aurigae", 76.9563, 30.4014, 2),
         ("R Draconis", 248.1675, 66.755, 2)
     ]
@@ -193,7 +194,7 @@ def get_season_metadata():
             with open(rpath) as f:
                 d = json.load(f)
             req = d.get("request", {})
-            if abs(req.get("ra", 0) - ra) < 0.001 and abs(req.get("dec", 0) - dec) < 0.001 and req.get("band") == band:
+            if abs(req.get("ra", 0) - ra) < 0.001 and abs(req.get("dec", 0) - dec) < 0.001 and req.get("band") == band and req.get("mode", "exposures") == "exposures":
                 matched_result = d
                 break
         if not matched_result:
@@ -300,7 +301,12 @@ def main():
         # Coordinates at epoch 2026.0
         ref_epoch = cat["ref_epoch"]
         dt_2026 = 2026.0 - ref_epoch
-        ra_2026, dec_2026 = propagate_coordinates(cat["ra_j2000_deg"], cat["dec_j2000_deg"], pm_ra, pm_dec, 2026.0 - 2000.0)
+        # The tabulated position ("ra_j2000_deg") is at epoch `position_epoch` where given
+        # (Barnard's Star: already moved back to J2000.0), otherwise at the catalogue's
+        # reference epoch. Propagating every target by a fixed 26 years was wrong for
+        # WISE 0855 (position at 2010.42), RW Aurigae (2016.0) and R Draconis (1991.25).
+        position_epoch = cat.get("position_epoch", ref_epoch)
+        ra_2026, dec_2026 = propagate_coordinates(cat["ra_j2000_deg"], cat["dec_j2000_deg"], pm_ra, pm_dec, 2026.0 - position_epoch)
         ra_2026_str, dec_2026_str = format_sexagesimal(ra_2026, dec_2026)
         
         s_list = seasons_meta.get(name, [])
