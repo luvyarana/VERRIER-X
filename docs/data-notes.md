@@ -123,3 +123,12 @@ Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment chec
 - The quick-pick positions were recomputed for epoch 2026.0 (see `docs/targets.md` §0). The old ones were off by 8.4″ (Barnard's Star), 12.5″ (Epsilon Indi B) and 31.5″ (WISE 0855).
 - IRSA's search returned 502 errors while the starter cache was rebuilt, so the exposure lists found at the old positions were reused for the new ones. The positions differ by at most 32″ and each exposure covers 3.5°, so the lists should be the same apart from exposures whose edge falls between the two positions.
 - At the corrected position, WISE 0855 shows up in combined visits in detectors 5 and 6 at 10–17σ, moving about 8″ west in a year, blended with a fixed background star 4.6″ away. `docs/evidence/wise0855_detectors.png` shows panels 2.8 arcminutes wide (rows: detector 6, 5, 3; columns: visits in time order). The star is the bright central object in the detector-3 row.
+
+## 10. Gaia overlay (V12, 2026-11-15)
+
+- `GET /api/gaia?ra=&dec=&fov=` returns up to 400 Gaia DR3 stars brighter than G = 17 around the position, with 2016.0 positions and proper motions. The search circle is wider than the field so that a fast star that has moved into the field since 2016 is still found.
+- The catalogue is read from GAVO's mirror (`dc.g-vo.org`, table `gaia.dr3lite`), with ESA's archive as a fallback. ESA's archive and VizieR both timed out from the development machine on 15 November.
+- The page moves each star to the frame's date and draws a green circle (the 60 brightest in the field) or an amber circle with the speed for stars faster than 0.2″ per year.
+- Checked on Barnard's Star: the amber Gaia marker (10.4″ per year) sits on the star in the August–September 2026 combined frame.
+- Epsilon Indi B and WISE 0855 are not in Gaia (too cool and faint), so they move with no marker, which is the case the tool is meant to reveal.
+- Gaia stars for the five targets are in the starter cache.

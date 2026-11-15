@@ -9,7 +9,7 @@ Run from the backend folder (takes a while; cutouts are cached in backend/cache)
 import shutil
 import time
 
-from app import archive, config, pipeline
+from app import archive, config, overlays, pipeline
 
 # Same positions as the quick-pick buttons in frontend/app/page.tsx.
 TARGETS = [
@@ -40,6 +40,15 @@ def main() -> None:
             src = config.CACHE_DIR / "search" / f"{c}_{ra:.4f}_{dec:.4f}.json"
             (seed / "search").mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, seed / "search" / src.name)
+        try:  # Gaia stars for the overlay
+            stars = overlays.gaia_stars(ra, dec, FOV)
+            (seed / "gaia").mkdir(parents=True, exist_ok=True)
+            src = config.find(f"gaia/{ra:.4f}_{dec:.4f}_{FOV:.1f}.json")
+            if src.parent != seed / "gaia":
+                shutil.copy2(src, seed / "gaia" / src.name)
+            print(f"  Gaia: {len(stars['stars'])} stars", flush=True)
+        except Exception as exc:
+            problems.append(f"{name} Gaia: {type(exc).__name__}: {exc}")
         for band in range(1, 7):
             for mode in ("seasons", "exposures"):
                 t0 = time.time()

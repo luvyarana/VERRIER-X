@@ -63,3 +63,30 @@ export async function getFrames(q: Query, signal: AbortSignal): Promise<Result |
   if (!res.ok) return { status: "error", message: `The server answered with an error (${res.status}).` };
   return res.json();
 }
+
+export type GaiaStar = { id: string; ra: number; dec: number; pmra: number; pmdec: number; parallax: number | null; g: number | null };
+
+/** Gaia DR3 stars around a position (2016.0 positions, proper motions in mas/yr). Empty if unavailable. */
+export async function getGaia(ra: number, dec: number, fov: number, signal: AbortSignal): Promise<GaiaStar[] | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/gaia?ra=${ra}&dec=${dec}&fov=${fov}`, { signal });
+    if (!res.ok) return null;
+    return (await res.json()).stars as GaiaStar[];
+  } catch {
+    return null;
+  }
+}
+
+const RAD = Math.PI / 180;
+
+/** Where a Gaia star is at a given date, as offsets in arcseconds (east, north) from the field centre. */
+export function starOffset(star: GaiaStar, mjd: number, ra0: number, dec0: number): [number, number] {
+  const years = 2000 + (mjd - 51544.5) / 365.25 - 2016.0;
+  const dec = star.dec + (star.pmdec * years) / 3.6e6;
+  const ra = star.ra + (star.pmra * years) / 3.6e6 / Math.cos(star.dec * RAD);
+  const da = (ra - ra0) * RAD, d = dec * RAD, d0 = dec0 * RAD;
+  const denom = Math.sin(d0) * Math.sin(d) + Math.cos(d0) * Math.cos(d) * Math.cos(da);
+  const xi = (Math.cos(d) * Math.sin(da)) / denom;
+  const eta = (Math.cos(d0) * Math.sin(d) - Math.sin(d0) * Math.cos(d) * Math.cos(da)) / denom;
+  return [(xi / RAD) * 3600, (eta / RAD) * 3600];
+}

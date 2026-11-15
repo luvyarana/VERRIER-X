@@ -12,7 +12,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from . import config, pipeline
+from . import config, overlays, pipeline
 from .archive import ArchiveError
 
 app = FastAPI(title="VERRIER-X", version="0.1.0")
@@ -70,6 +70,19 @@ def frames(
                                 "message": "Starting"}
             threading.Thread(target=_run, args=(key, (ra, dec, fov, band, mode)), daemon=True).start()
     return job
+
+
+@app.get("/api/gaia")
+def gaia(
+    ra: float = Query(..., ge=0, le=360),
+    dec: float = Query(..., ge=-90, le=90),
+    fov: float = Query(config.FOV_DEFAULT_ARCMIN, ge=config.FOV_MIN_ARCMIN, le=config.FOV_MAX_ARCMIN),
+):
+    """Gaia DR3 stars around a position: 2016.0 positions and proper motions (mas/yr)."""
+    try:
+        return overlays.gaia_stars(ra, dec, fov)
+    except ArchiveError as exc:
+        raise HTTPException(503, str(exc))
 
 
 @app.get("/api/frame/{key}/{name}.png")

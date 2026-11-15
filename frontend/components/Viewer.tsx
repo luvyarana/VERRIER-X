@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_URL, type Frame, type Result } from "@/lib/api";
+import { API_URL, getGaia, starOffset, type Frame, type GaiaStar, type Result } from "@/lib/api";
 
 const SEASON_COLOURS = ["#38bdf8", "#fbbf24", "#f472b6", "#4ade80", "#c084fc", "#fb923c"];
 const SPEEDS = [1, 2, 4, 8, 15];
@@ -25,6 +25,16 @@ export default function Viewer({ result }: { result: Result }) {
   const stacked = result.request.mode === "seasons";
   const [fps, setFps] = useState(stacked ? 1 : 4);
   const [marker, setMarker] = useState(true);
+  const [showGaia, setShowGaia] = useState(true);
+  const [gaia, setGaia] = useState<GaiaStar[] | null | undefined>(undefined); // undefined: loading, null: unavailable
+  const { ra: ra0, dec: dec0, fov_arcmin: fov } = result.request;
+
+  // Known stars from ESA's Gaia catalogue, to mark on the image.
+  useEffect(() => {
+    const abort = new AbortController();
+    getGaia(ra0, dec0, fov, abort.signal).then((stars) => !abort.signal.aborted && setGaia(stars));
+    return () => abort.abort();
+  }, [ra0, dec0, fov]);
   const ready = loaded >= frames.length;
   const frame: Frame | undefined = frames[Math.min(index, frames.length - 1)];
 
@@ -93,6 +103,29 @@ export default function Viewer({ result }: { result: Result }) {
       }
       ctx.stroke();
     }
+    if (showGaia && gaia && frame) {
+      // Gaia stars, moved to this frame's date. Fast movers are drawn in amber with their speed.
+      const half = (grid.size_px * grid.scale_arcsec) / 2;
+      let plain = 0;
+      for (const star of gaia) {
+        const [east, north] = starOffset(star, frame.mjd, ra0, dec0);
+        if (Math.abs(east) > half || Math.abs(north) > half) continue;
+        const speed = Math.hypot(star.pmra, star.pmdec) / 1000; // arcseconds per year
+        const fast = speed > 0.2;
+        if (!fast && ++plain > 60) continue; // brightest first; keep crowded fields readable
+        const x = s / 2 - east * perArcsec, y = s / 2 - north * perArcsec;
+        ctx.strokeStyle = fast ? "#fbbf24" : "rgba(52, 211, 153, 0.55)";
+        ctx.lineWidth = fast ? 3 : 1.5;
+        ctx.beginPath();
+        ctx.arc(x, y, fast ? 22 : 9, 0, 2 * Math.PI);
+        ctx.stroke();
+        if (fast) {
+          ctx.fillStyle = "#fbbf24";
+          ctx.fillText(`Gaia: ${speed.toFixed(1)}″/yr`, Math.min(x + 28, s - 190), y - 18);
+        }
+      }
+      ctx.lineWidth = 2;
+    }
     // Scale bar: 1 arcminute, or 5 for wide fields.
     const arcmin = grid.size_px * grid.scale_arcsec > 1500 ? 5 : 1;
     const bar = arcmin * 60 * perArcsec;
@@ -111,7 +144,7 @@ export default function Viewer({ result }: { result: Result }) {
     ctx.stroke();
     ctx.fillText("N", s - 37, 28);
     ctx.fillText("E", s - 96, 85);
-  }, [index, loaded, marker, grid]);
+  }, [index, loaded, marker, grid, showGaia, gaia, frame, ra0, dec0]);
 
   if (!frame) return null;
   const colour = SEASON_COLOURS[frame.season % SEASON_COLOURS.length];
@@ -170,8 +203,19 @@ export default function Viewer({ result }: { result: Result }) {
             <input type="checkbox" checked={marker} onChange={(e) => setMarker(e.target.checked)} className="accent-cyan-500" />
             Marker
           </label>
+          <label className="flex items-center gap-1.5 text-slate-400">
+            <input type="checkbox" checked={showGaia} onChange={(e) => setShowGaia(e.target.checked)} className="accent-emerald-400" />
+            Gaia stars
+          </label>
         </div>
         <p className="mt-2 text-xs text-slate-500">Space plays or pauses. Left and right arrows step one frame.</p>
+        <p className="mt-1 text-xs text-slate-500">
+          {gaia === undefined
+            ? "Loading known stars from Gaia…"
+            : gaia === null
+              ? "The Gaia star catalogue could not be reached, so known stars are not marked."
+              : "Green circles are stars in ESA's Gaia catalogue, placed where Gaia says they were on this frame's date. Amber marks a fast-moving star. Something that moves and has no circle is not in Gaia."}
+        </p>
       </div>
 
       <div className="space-y-5 text-sm">

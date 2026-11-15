@@ -229,3 +229,33 @@ def test_season_stack_removes_one_off_artefacts_and_lowers_noise():
     assert (stack["wavelength_min_um"], stack["wavelength_max_um"]) == (1.1, 1.52)
     assert stack["time_start"].startswith("2025-08-13") and stack["time_end"].startswith("2025-08-27")
     assert stack["target_flags"] == ["SOURCE"]
+
+
+def test_gaia_stars_are_parsed_and_cached(tmp_path, monkeypatch):
+    from app import config, overlays
+
+    monkeypatch.setattr(config, "CACHE_DIR", tmp_path / "cache")
+    monkeypatch.setattr(config, "SEED_DIR", tmp_path / "seed")
+    calls = []
+
+    class Answer:
+        text = ("source_id,ra,dec,pmra,pmdec,parallax,phot_g_mean_mag\n"
+                "4472832130942575872,269.4485,4.7394,-801.55,10362.39,546.98,8.19\n"
+                "123,269.5,4.7,,,,15.2\n")
+
+        def raise_for_status(self):
+            pass
+
+    def post(url, data, timeout):
+        calls.append(data["QUERY"])
+        return Answer()
+
+    monkeypatch.setattr(overlays.requests, "post", post)
+    first = overlays.gaia_stars(269.44627, 4.76819, 10.0)
+    second = overlays.gaia_stars(269.44627, 4.76819, 10.0)
+    assert len(calls) == 1 and first == second          # the second call comes from the cache
+    assert "CIRCLE('ICRS', 269.446270, 4.768190, 0.16500)" in calls[0]
+    star, faint = first["stars"]
+    assert star["id"] == "4472832130942575872" and star["pmdec"] == 10362.39
+    assert (faint["pmra"], faint["pmdec"], faint["parallax"]) == (0.0, 0.0, None)   # missing motion -> none
+    assert first["epoch"] == 2016.0

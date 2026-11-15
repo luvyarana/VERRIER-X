@@ -16,6 +16,7 @@ Try it on a fast-moving star: [Barnard's Star](https://frontend-ivory-one-19.ver
 - Lines the images up north-up on one grid, so stars stay on the same pixel from frame to frame.
 - Combines each visit's exposures into one deeper frame and blinks between visits ("Visits combined"), or plays every exposure as a movie coloured by observing season. Anything that jumps between visits has moved.
 - Lets you pick one of the six SPHEREx detectors (0.75 to 5.0 microns) and labels every frame with its date and wavelength.
+- Marks known stars from ESA's Gaia DR3 catalogue, each moved to the date of the frame. A fast star's marker travels with it; something that moves with no marker is not in Gaia.
 - Shows the quality flags at the centre of each frame and links to the original file.
 - Keeps the position in the link, so a view can be shared.
 
@@ -66,5 +67,7 @@ The code, tests and documentation in this repository were written with Claude Co
 This project uses data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.
 
 This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology.
+
+This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC). The Gaia catalogue is read through the TAP service of the German Astrophysical Virtual Observatory (GAVO).
 
 Software: Astropy, reproject, NumPy, SciPy, Pillow, FastAPI, Next.js, React, Tailwind CSS.
