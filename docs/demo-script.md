@@ -10,11 +10,14 @@
 
 ## 0. Recheck and updates (15 November 2026, afternoon)
 
-This record was rechecked after it was written. Three things changed, and they supersede the text below wherever the two disagree.
+This record was rechecked after it was written. Several things changed, and they supersede the text below wherever the two disagree.
 
 1. **Target positions corrected.** Three of the 2026.0 right ascensions in `docs/targets.md` were wrong (Barnard's Star, Epsilon Indi B, R Draconis), and the app's WISE 0855 marker was 31.5″ too far east. The quick-pick buttons and the starter cache now use the corrected positions; details are in `docs/targets.md` §0. All links in this record point to the corrected positions.
 2. **"Visits combined" view added.** The site now opens in a view that combines each visit's exposures into one deeper frame. The measurements below were made on the same kind of per-visit median image.
 3. **WISE 0855 is probably detected.** At the corrected position, combined visits in the 3.82–4.42 µm and 4.42–5.00 µm detectors show a source at the marker at 10–17σ whose peak moves about 8″ west in a year (predicted: 7.9″). It is blended with a fixed background star 4.6″ away, so this is a probable detection, not a clean one. Section 4 below describes the earlier test at the wrong position and is kept only as a record. See `docs/targets.md` §6.3.
+
+4. **More features went live after this record was written:** a Difference view (each later visit minus the first), circles on known Gaia DR3 stars placed for each frame's date, search by object name, and a plain-language list of the quality flags in each frame. In the Difference view Barnard's Star and Epsilon Indi B each show a clear dark-and-bright pair; the Gaia marker for Barnard's Star (10.4″ per year) sits on the star. Defect Report 3 (no caveat about uncalibrated brightness) is partly addressed by the notes beside the image; no calibrated light curve exists.
+5. **NASA's IRSA image search returned errors through the afternoon of 15 November.** While it is down, only the five test targets and other cached positions load; new positions show a message and a retry button.
 
 Offsets re-measured at the corrected positions (east, north of the marker, from per-visit median images):
 
