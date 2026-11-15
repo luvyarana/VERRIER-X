@@ -312,3 +312,14 @@ def test_name_lookup_moves_a_fast_star_to_the_given_date():
 
     with pytest.raises(resolve.NotFound):
         resolve.parse_sesame("<Sesame><Target><INFO>Nothing found</INFO></Target></Sesame>")
+
+
+def test_name_lookup_lands_on_the_stored_test_targets():
+    from app import config, resolve
+
+    barnard = resolve.snap(resolve.move_to(
+        {"ra_j2000": 269.45207696, "dec_j2000": 4.69336497, "pm_ra": -801.551, "pm_dec": 10362.394}, config.MARKER_EPOCH))
+    assert (barnard["ra"], barnard["dec"]) == (269.44627, 4.76819)       # exactly the quick-pick position
+    far = resolve.snap({"ra": 10.68471, "dec": 41.26875})
+    assert (far["ra"], far["dec"]) == (10.68471, 41.26875)               # anything else is left alone
+    assert config.snap_to_known(269.44627 + 5 / 3600, 4.76819) == (269.44627 + 5 / 3600, 4.76819)

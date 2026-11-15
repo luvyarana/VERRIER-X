@@ -146,3 +146,10 @@ Code: `backend/app/`. Tests: `backend/tests/` (16 offline tests). Alignment chec
 - Each frame now lists every quality flag present in the field with the share of pixels carrying it; the page adds a plain-language meaning for each.
 - Message states checked in the browser against a stand-in server: no images anywhere, no images in this detector, only one visit (difference view), archive search down, server error, server unreachable, name not found.
 - **IRSA's image search returned 502 errors through the afternoon of 15 November.** While it is down, only positions already in the cache load; new positions show the "archive is not answering" message with a retry button. The five test targets are unaffected because they ship with the backend.
+
+## 13. Final audit (2026-11-15, 22:30)
+
+- All 90 stored frame sets (5 targets, 6 detectors, 3 views) were requested from the public backend: every one returned frames, valid PNG images, wavelengths and flag summaries. Six were slow only because the backend was waking from sleep (about 55 s); one request failed once with a connection error and worked on retry.
+- IRSA's search was answering again (23–26 s per query). A brand-new position (Wolf 359) loaded end to end on the public backend in 104 s: 45 exposures in 3 visits.
+- Name lookup now returns the position at epoch 2026.0 rather than today's date, and a result within 2″ of a stored test target is moved onto it. Looking up "Barnard's Star", "Epsilon Indi B", "WISE 0855", "RW Aurigae" or "R Draconis" therefore loads the stored frames at once, without IRSA.
+- A scheduled GitHub job asks for the backend's health page every 10 minutes so that Render's free plan does not put it to sleep.

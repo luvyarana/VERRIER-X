@@ -25,6 +25,28 @@ def find(relative: str) -> Path | None:
     return None
 
 
+# Positions (epoch 2026.0) whose frames ship in the starter cache. A request within
+# 2 arcseconds of one of them (a third of a SPHEREx pixel) is moved onto it.
+MARKER_EPOCH = 2026.0
+KNOWN_POSITIONS = [
+    (269.44627, 4.76819),    # Barnard's Star
+    (331.09636, -56.80058),  # Epsilon Indi B
+    (133.75969, -7.24223),   # WISE 0855
+    (76.9563, 30.4014),      # RW Aurigae
+    (248.1675, 66.755),      # R Draconis
+]
+
+
+def snap_to_known(ra: float, dec: float, tolerance_arcsec: float = 2.0) -> tuple[float, float]:
+    import math
+
+    for kra, kdec in KNOWN_POSITIONS:
+        d_ra = (ra - kra) * math.cos(math.radians(kdec)) * 3600
+        if math.hypot(d_ra, (dec - kdec) * 3600) <= tolerance_arcsec:
+            return kra, kdec
+    return ra, dec
+
+
 SEARCH_RADIUS_DEG = 0.003      # the target itself must be inside the exposure
 SEARCH_TTL_DAYS = 7            # how long a cached search result is trusted
 SEARCH_TRIES = 4

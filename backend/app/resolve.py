@@ -1,15 +1,16 @@
 """Turn an object name into a sky position, using the CDS Sesame name resolver (SIMBAD).
 
 SIMBAD gives the position at epoch 2000. For a star with a known proper motion the
-position is moved to today's date, because a nearby star can be arcminutes away from
-where it was in 2000. Answers are cached on disk.
+position is moved to epoch 2026.0, the middle of the SPHEREx data, because a nearby
+star can be arcminutes away from where it was in 2000. A fixed epoch (not today's
+date) keeps the answer the same from day to day, so cached frames are reused.
+Answers are cached on disk.
 """
 
 import json
 import math
 import re
 import time
-from datetime import datetime, timezone
 from urllib.parse import quote
 
 import requests
@@ -22,6 +23,14 @@ SESAME = [
     "https://vizier.idia.ac.za/viz-bin/nph-sesame/-oxp/SNV?",
     "https://cds.unistra.fr/cgi-bin/nph-sesame/-oxp/SNV?",
 ]
+
+
+# Short names people use that SIMBAD does not know.
+ALIASES = {
+    "wise 0855": "WISE J085510.83-071442.5",
+    "wise 0855-0714": "WISE J085510.83-071442.5",
+    "wise0855": "WISE J085510.83-071442.5",
+}
 
 
 class NotFound(LookupError):
@@ -51,15 +60,23 @@ def move_to(found: dict, year: float) -> dict:
             "moved_arcsec": round(moved, 1)}
 
 
+def snap(found: dict) -> dict:
+    """Use the stored position of a test target when the answer is within 2 arcseconds of it,
+    so that its ready-made frames are used."""
+    ra, dec = config.snap_to_known(found["ra"], found["dec"])
+    return {**found, "ra": ra, "dec": dec}
+
+
 def resolve(name: str) -> dict:
     name = " ".join(name.split())
     if not name or len(name) > 80:
         raise NotFound
-    year = 2000.0 + (datetime.now(timezone.utc) - datetime(2000, 1, 1, 12, tzinfo=timezone.utc)).days / 365.25
+    name = ALIASES.get(name.lower(), name)
+    year = config.MARKER_EPOCH
     slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "x"
     known = config.find(f"resolve/{slug}.json")
     if known:
-        return {"name": name, **move_to(json.loads(known.read_text()), year)}
+        return {"name": name, **snap(move_to(json.loads(known.read_text()), year))}
     last = "no attempt"
     for base in SESAME:
         try:
@@ -67,7 +84,7 @@ def resolve(name: str) -> dict:
             r.raise_for_status()
             found = parse_sesame(r.text)
             _write_atomic(config.CACHE_DIR / f"resolve/{slug}.json", json.dumps(found).encode())
-            return {"name": name, **move_to(found, year)}
+            return {"name": name, **snap(move_to(found, year))}
         except NotFound:
             raise
         except requests.RequestException as exc:

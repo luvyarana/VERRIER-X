@@ -54,7 +54,7 @@ export default function Home() {
     if (typeof found === "string") return setFormError(found);
     setNameNote(
       found.moved_arcsec >= 1
-        ? `${found.name}: moved ${found.moved_arcsec.toFixed(0)}″ from its year-2000 catalogue position to where it is now, using its known motion.`
+        ? `${found.name}: moved ${found.moved_arcsec.toFixed(0)}″ from its year-2000 catalogue position to where it was at the start of 2026, using its known motion.`
         : `${found.name}: found.`,
     );
     run({ ra: found.ra, dec: found.dec, fov, band: query?.band ?? 2, mode: query?.mode ?? "seasons" });

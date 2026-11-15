@@ -12,7 +12,7 @@ Try it on a fast-moving star: [Barnard's Star](https://frontend-ivory-one-19.ver
 ## What it does
 
 - Takes RA and Dec in degrees or in hours/degrees, minutes and seconds, and a field of view from 5 to 60 arcminutes.
-- Or takes an object name (looked up in SIMBAD) and moves a fast star from its catalogue position to where it is today.
+- Or takes an object name (looked up in SIMBAD) and moves a fast star from its year-2000 catalogue position to where it was at the start of 2026, the middle of the SPHEREx data.
 - Finds every public SPHEREx exposure of that position (Data Release 1 and Quick Release 3, April 2025 to October 2026).
 - Lines the images up north-up on one grid, so stars stay on the same pixel from frame to frame.
 - Combines each visit's exposures into one deeper frame and blinks between visits ("Visits combined"), or plays every exposure as a movie coloured by observing season. Anything that jumps between visits has moved.
@@ -67,6 +67,8 @@ The code, tests and documentation in this repository were written with Claude Co
 ## Data credit
 
 This project uses data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.
+
+SPHEREx Quick Release 3 spectral images: DOI [10.26131/IRSA662](https://doi.org/10.26131/IRSA662). Data Release 1 images are read from the same archive; no separate DOI for them was found on the IRSA SPHEREx page on 15 November 2026.
 
 This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology.
 
